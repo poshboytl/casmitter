@@ -28,8 +28,7 @@ production:
   primary: &primary_production
     <<: *default
     adapter: postgresql
-    database: casmitter
-    username: casmitter
+    database: myapp
   cache:
     <<: *primary_production
     database: myapp_production_cache
