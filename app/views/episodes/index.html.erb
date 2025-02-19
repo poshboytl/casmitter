@@ -1,172 +1,120 @@
-  <nav class="flex justify-between items-center p-4">
-    <img alt="Teahour podcast logo" class="h-10" height="40" src="<%= asset_path("cover_small.jpg")%>" width="40"/>
-   <div class="space-x-6 text-gray-600 text-sm">
-    <a class="hover:text-gray-900" href="#">
-     About
-    </a>
-    <a class="hover:text-gray-900" href="#">
-     Episodes
-    </a>
-    <a class="hover:text-gray-900" href="#">
-     Hosts
-    </a>
-    <a class="hover:text-gray-900" href="#">
-     Contact
-    </a>
-    <a class="hover:text-gray-900" href="#">
-     Search
-    </a>
-    <a class="hover:text-gray-900" href="#">
-     Subscribe
-    </a>
-   </div>
-  </nav>
-  <!-- Hero Section -->
-  <div class="max-w-5xl mx-auto mb-16">
-    <img alt="A person in a brown suit standing against a green tiled wall with urinals" class="w-full mb-6" height="400" src="<%= asset_path("teahour.png")%>" width="1200"/>
-   <h1 class="text-4xl font-bold text-center mb-2">
-     Teahour 2.0
-   </h1>
-   <p class="text-center text-gray-600 mb-4">
-     For Full Spectrum Developers
-   </p>
-   <div class="flex justify-center space-x-4 text-sm text-gray-500">
+<div class="max-w-5xl mx-auto mb-16">
+  <img alt="A person in a brown suit standing against a green tiled wall with urinals" class="w-full mb-6" height="400" src="<%= asset_path("omteahour.png")%>" width="1200"/>
+  <h1 class="text-4xl font-bold text-center mb-2">
+    Teahour 2.0
+  </h1>
+  <p class="text-center text-gray-600 mb-4">
+  For Full Spectrum Developers
+  </p>
+  <div class="flex justify-center space-x-4 text-sm text-gray-500">
     <span>
-     APPLE POCASTS
+      APPLE POCASTS
     </span>
     <span>
       Spotify
     </span>
-   </div>
   </div>
-  <!-- About Section -->
-  <div class="max-w-5xl mx-auto mb-16 flex gap-16">
-   <div class="flex-1">
+</div>
+<!-- About Section -->
+<div class="max-w-5xl mx-auto mb-16 flex gap-16">
+  <div class="flex-1">
     <h2 class="font-bold mb-4">
-     About the show
+      About the show
     </h2>
     <p class="text-gray-600 mb-8">
-      聚焦于程序、创业以及一切 Geek 话题的中文播客
+    聚焦于程序、创业以及一切 Geek 话题的中文播客
     </p>
     <h2 class="font-bold mb-4">
-     Teahour on social media
+      Teahour on social media
     </h2>
     <div class="flex space-x-2">
-     <a class="bg-black text-white p-2 rounded" href="#">
-      𝕏
-     </a>
+      <a class="bg-black text-white p-2 rounded" href="#">
+        𝕏
+      </a>
     </div>
-   </div>
-   <div class="w-64">
+  </div>
+  <div class="w-64">
     <h2 class="font-bold mb-4">
-     Your Hosts
+      Your Hosts
     </h2>
     <div class="flex space-x-4">
-     <div class="text-center">
-      <img alt="Terry Tai" class="rounded-full mb-2" height="60" src="https://media24.fireside.fm/file/fireside-images-2024/podcasts/images/6/635ad9f1-6ce0-4f31-84cf-030e0c949169/hosts/7/74b2858e-14c6-4e8d-9101-92e94b091570/avatar_small.jpg?v=1" width="60"/>
-      <p class="text-sm">
-      Terry Tai
-      </p>
-     </div>
-     <div class="text-center">
-      <img alt="Jan Xie" class="rounded-full mb-2" height="60" src="https://media24.fireside.fm/file/fireside-images-2024/podcasts/images/3/334350f0-77d5-4fdd-b27d-7bf0c60a4d26/hosts/a/a2871a9d-59fb-4b61-baef-dbfb951e0a96/avatar_small.jpg?v=1" width="60"/>
-      <p class="text-sm">
+      <div class="text-center">
+        <img alt="Terry Tai" class="rounded-full mb-2" height="60" src="https://media24.fireside.fm/file/fireside-images-2024/podcasts/images/6/635ad9f1-6ce0-4f31-84cf-030e0c949169/hosts/7/74b2858e-14c6-4e8d-9101-92e94b091570/avatar_small.jpg?v=1" width="60"/>
+        <p class="text-sm">
+        Terry Tai
+        </p>
+      </div>
+      <div class="text-center">
+        <img alt="Jan Xie" class="rounded-full mb-2" height="60" src="https://media24.fireside.fm/file/fireside-images-2024/podcasts/images/3/334350f0-77d5-4fdd-b27d-7bf0c60a4d26/hosts/a/a2871a9d-59fb-4b61-baef-dbfb951e0a96/avatar_small.jpg?v=1" width="60"/>
+        <p class="text-sm">
         Jan Xie
-      </p>
-     </div>
+        </p>
+      </div>
     </div>
-   </div>
   </div>
-  <!-- Episodes Section -->
-  <div class="max-w-5xl mx-auto mb-16">
-   <h2 class="font-bold mb-8">
+</div>
+<!-- Episodes Section -->
+<div class="max-w-5xl mx-auto mb-16">
+  <h2 class="font-bold mb-8">
     Episodes
-   </h2>
-   <div class="grid grid-cols-3 gap-8">
+  </h2>
+  <div class="grid grid-cols-3 gap-8">
     <!-- Episode cards -->
     <div class="episode-card">
       <img alt="Back to Work Episode 644" class="w-full mb-4" height="400" src="<%= asset_path 'cover.avif' %>" width="400"/>
-     <h3 class="text-blue-500 hover:underline mb-2">
-      #95 - 用 Chromebook 做开发是什么样的体验？
-     </h3>
-     <p class="text-sm text-gray-500">
+      <h3 class="text-blue-500 hover:underline mb-2">
+        #95 - 用 Chromebook 做开发是什么样的体验？
+      </h3>
+      <p class="text-sm text-gray-500">
       March 4th, 2024 | 1 hr 52 mins
-     </p>
+      </p>
     </div>
     <div class="episode-card">
-     <img alt="Back to Work Episode 643" class="w-full mb-4" height="400" src="<%= asset_path 'cover.avif' %>" width="400"/>
-     <h3 class="text-blue-500 hover:underline mb-2">
-      #94 - 与 Hawstein 和左程云聊算法和数据结构
-     </h3>
-     <p class="text-sm text-gray-500">
+      <img alt="Back to Work Episode 643" class="w-full mb-4" height="400" src="<%= asset_path 'cover.avif' %>" width="400"/>
+      <h3 class="text-blue-500 hover:underline mb-2">
+        #94 - 与 Hawstein 和左程云聊算法和数据结构
+      </h3>
+      <p class="text-sm text-gray-500">
       March 1st, 2024 | 1 hr 38 mins
-     </p>
+      </p>
     </div>
     <div class="episode-card">
-     <img alt="Back to Work Episode 642" class="w-full mb-4" height="400" src="<%= asset_path 'cover.avif' %>" width="400"/>
-     <h3 class="text-blue-500 hover:underline mb-2">
-      #93 - 微信小程序火了！
-     </h3>
-     <p class="text-sm text-gray-500">
+      <img alt="Back to Work Episode 642" class="w-full mb-4" height="400" src="<%= asset_path 'cover.avif' %>" width="400"/>
+      <h3 class="text-blue-500 hover:underline mb-2">
+        #93 - 微信小程序火了！
+      </h3>
+      <p class="text-sm text-gray-500">
       March 1st, 2024 | 1 hr 45 mins
-     </p>
+      </p>
     </div>
 
     <!-- Pagination -->
-   <div class="flex justify-center space-x-2 mt-8">
-    <a class="text-gray-600" href="#">
-     ← PREVIOUS
-    </a>
-    <a class="text-gray-600" href="#">
-     1
-    </a>
-    <a class="text-gray-600" href="#">
-     2
-    </a>
-    <a class="text-gray-600" href="#">
-     3
-    </a>
-    <span class="text-gray-300">
-     ...
-    </span>
-    <a class="text-gray-600" href="#">
-     53
-    </a>
-    <a class="text-gray-600" href="#">
-     54
-    </a>
-    <a class="text-gray-600" href="#">
-     NEXT →
-    </a>
-   </div>
-  </div>
-  <!-- Footer -->
-  <footer class="bg-black text-white py-8">
-   <div class="max-w-5xl mx-auto">
-    <div class="flex justify-between items-center mb-4">
-     <p class="text-sm">
-      Teahour © 2025 by Terry Tai
-     </p>
-     <div class="space-x-6 text-sm">
-      <a class="hover:text-gray-300" href="#">
-       About
+    <div class="flex justify-center space-x-2 mt-8">
+      <a class="text-gray-600" href="#">
+        ← PREVIOUS
       </a>
-      <a class="hover:text-gray-300" href="#">
-       Episodes
+      <a class="text-gray-600" href="#">
+        1
       </a>
-      <a class="hover:text-gray-300" href="#">
-       Hosts
+      <a class="text-gray-600" href="#">
+        2
       </a>
-      <a class="hover:text-gray-300" href="#">
-       Contact
+      <a class="text-gray-600" href="#">
+        3
       </a>
-      <a class="hover:text-gray-300" href="#">
-       Search
+      <span class="text-gray-300">
+        ...
+      </span>
+      <a class="text-gray-600" href="#">
+        53
       </a>
-      <a class="hover:text-gray-300" href="#">
-       Subscribe
+      <a class="text-gray-600" href="#">
+        54
       </a>
-     </div>
+      <a class="text-gray-600" href="#">
+        NEXT →
+      </a>
     </div>
-   </div>
-  </footer>
+  </div>
+</div>
+

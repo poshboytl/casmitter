@@ -22,7 +22,63 @@
     <%= javascript_importmap_tags %>
   </head>
 
+  <!-- header-->
+  <nav class="flex justify-between items-center p-4">
+    <img alt="Teahour podcast logo" class="h-10" height="40" src="<%= asset_path("logo.png")%>" width="40"/>
+   <div class="space-x-6 text-gray-600 text-sm">
+    <a class="hover:text-gray-900" href="#">
+     About
+    </a>
+    <a class="hover:text-gray-900" href="#">
+     Episodes
+    </a>
+    <a class="hover:text-gray-900" href="#">
+     Hosts
+    </a>
+    <a class="hover:text-gray-900" href="#">
+     Contact
+    </a>
+    <a class="hover:text-gray-900" href="#">
+     Search
+    </a>
+    <a class="hover:text-gray-900" href="#">
+     Subscribe
+    </a>
+   </div>
+  </nav>
+
   <body>
     <%= yield %>
   </body>
+
+  <!-- Footer -->
+  <footer class="bg-black text-white py-8">
+    <div class="max-w-5xl mx-auto">
+      <div class="flex justify-between items-center mb-4">
+        <p class="text-sm">
+        Teahour © 2025 by Terry Tai
+        </p>
+        <div class="space-x-6 text-sm">
+          <a class="hover:text-gray-300" href="#">
+            About
+          </a>
+          <a class="hover:text-gray-300" href="#">
+            Episodes
+          </a>
+          <a class="hover:text-gray-300" href="#">
+            Hosts
+          </a>
+          <a class="hover:text-gray-300" href="#">
+            Contact
+          </a>
+          <a class="hover:text-gray-300" href="#">
+            Search
+          </a>
+          <a class="hover:text-gray-300" href="#">
+            Subscribe
+          </a>
+        </div>
+      </div>
+    </div>
+  </footer>
 </html>
