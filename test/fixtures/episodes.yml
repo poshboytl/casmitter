@@ -1,11 +1,31 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
-one:
-  name: MyString
-  file_uri: MyString
-  desc: MyText
+ep1:
+  name: "聊聊比特币背后的技术和 Blockchain"
+  file_uri: "https://casmitter.s3.us-east-2.amazonaws.com/episodes/1.mp3"
+  desc: "聊聊比特币背后的技术和 Blockchain"
+  summary: "比特币背后的技术和 Blockchain"
+  status: 1
+  keywords: "比特币,区块链,blockchain,bitcoin"
+  number: 1
+  slug: "1-bitcoin-and-blockchain"
 
-two:
-  name: MyString
-  file_uri: MyString
-  desc: MyText
+ep2:
+  name: "聊聊 Rust 编程语言"
+  file_uri: "https://casmitter.s3.us-east-2.amazonaws.com/episodes/2.mp3"
+  desc: "聊聊 Rust 编程语言"
+  summary: "Rust 编程语言"
+  status: 1
+  keywords: "rust,编程语言"
+  number: 2
+  slug: "2-rust-programming-language"
+
+ep3:
+  name: "聊聊 Ruby 和 Rails"
+  file_uri: "https://casmitter.s3.us-east-2.amazonaws.com/episodes/3.mp3"
+  desc: "聊聊 Ruby 和 Rails"
+  summary: "Ruby 和 Rails"
+  status: 1
+  keywords: "ruby,rails,编程语言"
+  number: 3
+  slug: "3-ruby-and-rails"

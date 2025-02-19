@@ -2,7 +2,7 @@ require "test_helper"
 
 class EpisodesControllerTest < ActionDispatch::IntegrationTest
   setup do
-    @episode = episodes(:one)
+    @episode = episodes(:ep1)
   end
 
   test "should get index" do
@@ -24,23 +24,23 @@ class EpisodesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should show episode" do
-    get episode_url(@episode)
+    get episode_url(@episode.slug)
     assert_response :success
   end
 
   test "should get edit" do
-    get edit_episode_url(@episode)
+    get edit_episode_url(@episode.slug)
     assert_response :success
   end
 
   test "should update episode" do
-    patch episode_url(@episode), params: { episode: { desc: @episode.desc, file_uri: @episode.file_uri, name: @episode.name } }
+    patch episode_url(@episode.slug), params: { episode: { desc: @episode.desc, file_uri: @episode.file_uri, name: @episode.name } }
     assert_redirected_to episode_url(@episode)
   end
 
   test "should destroy episode" do
     assert_difference("Episode.count", -1) do
-      delete episode_url(@episode)
+      delete episode_url(@episode.slug)
     end
 
     assert_redirected_to episodes_url
