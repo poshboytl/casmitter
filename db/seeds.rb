@@ -19,7 +19,9 @@ episode_82 = Episode.new(
   summary: '本期由 Terry 主持, 请到了他的最好基友 Jan, 和他聊聊比特币背后的技术, 分布式系统, 算法以及Blockchain.',
   desc: "a long desc",
   status: 1,
-  keywords: 'blockchain, bitcoin'
+  keywords: 'blockchain, bitcoin',
+  number: 82,
+  slug: '82'
 )
 
 Attendance.create(attendee: terry, episode: episode_82)
