@@ -2,14 +2,14 @@
   <div class="bg-white py-12">
    <div class="container mx-auto px-4 text-center">
     <h2 class="text-4xl font-bold text-gray-700">
-     #82 - 聊聊比特币背后的技术和 Blockchain
+     <%= @episode.name %>
     </h2>
     <p class="text-gray-500 mt-2">
      Episode 82 · December 27th, 2015 · 2 hrs 11 mins
     </p>
     <div class="mt-4">
      <audio class="w-full" controls="">
-      <source src="your-audio-file.mp3" type="audio/mpeg"/>
+      <source src="<%= @episode.file_uri %>" type="audio/mpeg"/>
       Your browser does not support the audio element.
      </audio>
     </div>
