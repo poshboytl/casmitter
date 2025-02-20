@@ -24,4 +24,5 @@ episode_82 = Episode.new(
   slug: '82'
 )
 
-Attendance.create(attendee: terry, episode: episode_82)
+Attendance.create(attendee: terry, episode: episode_82, role: 0)
+Attendance.create(attendee: guest, episode: episode_82, role: 1)
