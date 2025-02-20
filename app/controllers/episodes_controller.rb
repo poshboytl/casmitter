@@ -4,6 +4,7 @@ class EpisodesController < ApplicationController
   # GET /episodes or /episodes.json
   def index
     @episodes = Episode.all
+    @hosts = Host.all
   end
 
   # GET /episodes/1 or /episodes/1.json
