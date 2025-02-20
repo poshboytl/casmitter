@@ -13,4 +13,8 @@ Rails.application.routes.draw do
   # Defines the root path route ("/")
   # root "posts#index"
   root "episodes#index"
+
+  # long live RSS!!!
+  get 'feed' => 'episodes#index', :defaults => { :format => 'rss' }
+  get 'rss'  => 'episodes#index', :defaults => { :format => 'rss' }
 end
