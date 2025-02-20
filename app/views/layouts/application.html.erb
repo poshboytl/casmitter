@@ -24,7 +24,9 @@
 
   <!-- header-->
   <nav class="flex justify-between items-center p-4">
-    <img alt="Teahour podcast logo" class="h-20" height="80" src="<%= asset_path("logo.png")%>" width="80"/>
+    <%= link_to root_path do %>
+      <img alt="Teahour podcast logo" class="h-20" height="80" src="<%= asset_path("logo.png")%>" width="80"/>
+    <% end %>
    <div class="space-x-6 text-gray-600 text-sm">
     <a class="hover:text-gray-900" href="#">
      About

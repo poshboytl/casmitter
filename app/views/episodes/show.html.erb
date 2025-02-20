@@ -1,11 +1,18 @@
-<main class="max-w-5xl mx-auto px-4 py-8">
+
+<main class="max-w-5xl mx-auto mb-16">
+   <div class="container mx-auto px-4 text-center">
+     <h1 class="text-4xl font-bold text-gray-700">
+       Teahour 2.0
+     </h2>
+  </div>
+  <img alt="A person in a brown suit standing against a green tiled wall with urinals" class="w-full mb-3" height="400" src="<%= asset_path("omshow.png")%>" width="1200"/>
   <div class="bg-white py-12">
    <div class="container mx-auto px-4 text-center">
     <h2 class="text-4xl font-bold text-gray-700">
      <%= @episode.name %>
     </h2>
     <p class="text-gray-500 mt-2">
-     Episode 82 · December 27th, 2015 · 2 hrs 11 mins
+     Episode <%= @episode.number %> · <%= @episode.published_at.strftime("%Y-%m-%d") %> · <%= @episode.duration / 3600 %> hr <%= (@episode.duration % 3600) / 60 %> mins
     </p>
     <div class="mt-4">
      <audio class="w-full" controls="">
@@ -48,14 +55,16 @@
    </div>
   </div>
   <!----- Host begin ----->
+
   <div class="mb-8 flex gap-8">
     <div>
       <h2 class="text-sm font-medium mb-4">
         Your Hosts
       </h2>
       <div class="flex gap-2">
-        <img alt="Host 1 profile picture" class="w-10 h-10 rounded-full" height="40" src="https://replicate.delivery/xezq/EedlfcCbX5jPIkYEn8eDBYq4am3Idw2FWx6PMn8TwfwiRfFiC/out-0.png" width="40"/>
-        <img alt="Host 2 profile picture" class="w-10 h-10 rounded-full" height="40" src="https://replicate.delivery/xezq/0neytSp3uG3AHyxmbnCW1Af1jdyNYOebCw9Mj5GcQtKxofCRB/out-0.png" width="40"/>
+        <% @hosts.each do |host| %>
+          <img alt="Host 1 profile picture" class="w-10 h-10 rounded-full" height="40" src="<%= host.avatar_url %>" width="40"/>
+        <% end %>
       </div>
     </div>
     <div>
@@ -63,8 +72,9 @@
         Guests
       </h2>
       <div class="flex gap-2">
-        <img alt="Guest 1 profile picture" class="w-10 h-10 rounded-full" height="40" src="https://replicate.delivery/xezq/Be5ywOQdhEVhKCVXGO9DiVX5PXR9d9F2CluCfMb5cewMvfCRB/out-0.png" width="40"/>
-        <img alt="Guest 2 profile picture" class="w-10 h-10 rounded-full" height="40" src="https://replicate.delivery/xezq/8Z6M3yNs5t5LJhXM0K7rJGt5nfrH0e7ZNIEZKDbXjfLMvfCRB/out-0.png" width="40"/>
+        <% @guests.each do |guest| %>
+          <img alt="Guest 1 profile picture" class="w-10 h-10 rounded-full" height="40" src="<%= guest.avatar_url %>" width="40"/>
+        <% end %>
       </div>
     </div>
   </div>
@@ -84,38 +94,14 @@
       About this Episode
     </h2>
     <p class="text-gray-600 mb-4">
-    An important discussion about aging as examined and explained through the lens of James Howlett.
+      <%= @episode.summary %>
     </p>
   </div>
   <div class="mb-8">
     <h2 class="text-xl font-medium mb-4">
-      Episode Links
+      Show Notes
     </h2>
-    <ul class="space-y-2">
-      <li>
-        <a class="text-blue-500" href="#">
-          David Ferrie - Wikipedia
-        </a>
-      </li>
-      <li>
-        <a class="text-blue-500" href="#">
-          Merlin's Wisdom Project
-        </a>
-        <span class="text-gray-600">
-          — "It's only advice for you because it had to be advice for me."
-        </span>
-      </li>
-      <li>
-        <a class="text-blue-500" href="#">
-          Max Eisenhardt (Earth-616) | Marvel Database | Fandom
-        </a>
-      </li>
-      <li>
-        <a class="text-blue-500" href="#">
-          Magneto | X-Men Wiki | Fandom
-        </a>
-      </li>
-    </ul>
+    <%= @episode.desc %>
   </div>
   <div class="flex justify-between text-sm">
     <a class="text-gray-600" href="#">

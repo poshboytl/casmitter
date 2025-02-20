@@ -8,6 +8,8 @@ class EpisodesController < ApplicationController
 
   # GET /episodes/1 or /episodes/1.json
   def show
+    @hosts = @episode.hosts
+    @guests = @episode.guests
   end
 
   # GET /episodes/new

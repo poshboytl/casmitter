@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_02_19_235923) do
+ActiveRecord::Schema[8.0].define(version: 2025_02_20_072728) do
   create_table "attendances", force: :cascade do |t|
     t.integer "attendee_id"
     t.integer "episode_id"
@@ -40,5 +40,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_19_235923) do
     t.string "keywords"
     t.integer "number", default: 999, null: false
     t.string "slug"
+    t.datetime "published_at"
+    t.integer "duration"
   end
 end
