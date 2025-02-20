@@ -5,3 +5,4 @@ class Episode < ApplicationRecord
   has_many :hosts, through: :attendances
   has_many :guests, through: :attendances
 end
+

@@ -1,4 +1,6 @@
 class Attendance < ApplicationRecord
+  enum :role,  host: 0, guest: 1
+
   belongs_to :attendee
   belongs_to :episode
 

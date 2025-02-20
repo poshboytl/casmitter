@@ -10,12 +10,13 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_02_19_101420) do
+ActiveRecord::Schema[8.0].define(version: 2025_02_19_235923) do
   create_table "attendances", force: :cascade do |t|
     t.integer "attendee_id"
     t.integer "episode_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "role"
   end
 
   create_table "attendees", force: :cascade do |t|
@@ -25,6 +26,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_19_101420) do
     t.string "bio"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "avatar_url"
   end
 
   create_table "episodes", force: :cascade do |t|

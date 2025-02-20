@@ -1,9 +1,30 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+ep1_host:
+  episode: ep1
+  attendee: jason
+  role: 0
 
-one:
-  attendee_id: 1
-  episode_id: 1
+ep1_guest1:
+  episode: ep1
+  attendee: kevin
+  role: 1
 
-two:
-  attendee_id: 1
-  episode_id: 1
+ep2_host:
+  episode: ep2
+  attendee: jason
+  role: 0
+
+ep2_guest1:
+  episode: ep2
+  attendee: sarah
+  role: 1
+
+ep3_host:
+  episode: ep3
+  attendee: jason
+  role: 0
+
+ep3_guest1:
+  episode: ep3
+  attendee: mike
+  role: 1
