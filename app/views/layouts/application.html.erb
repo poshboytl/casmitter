@@ -29,23 +29,11 @@
       <img alt="Teahour podcast logo" class="h-20" height="80" src="<%= asset_path("logo.png")%>" width="80"/>
     <% end %>
    <div class="space-x-6 text-gray-600 text-sm">
-    <a class="hover:text-gray-900" href="#">
-     About
+    <a class="hover:text-gray-900" href="/">
+        Home
     </a>
-    <a class="hover:text-gray-900" href="#">
-     Episodes
-    </a>
-    <a class="hover:text-gray-900" href="#">
-     Hosts
-    </a>
-    <a class="hover:text-gray-900" href="#">
-     Contact
-    </a>
-    <a class="hover:text-gray-900" href="#">
-     Search
-    </a>
-    <a class="hover:text-gray-900" href="#">
-     Subscribe
+    <a class="hover:text-gray-900" href="/feed">
+      RSS
     </a>
    </div>
   </nav>
@@ -59,26 +47,14 @@
     <div class="max-w-5xl mx-auto">
       <div class="flex justify-between items-center mb-4">
         <p class="text-sm">
-        Teahour © 2025 by Terry Tai
+        Teahour © <%= Date.today.year %>
         </p>
         <div class="space-x-6 text-sm">
-          <a class="hover:text-gray-300" href="#">
-            About
+          <a class="hover:text-gray-300" href="/">
+            Home
           </a>
-          <a class="hover:text-gray-300" href="#">
-            Episodes
-          </a>
-          <a class="hover:text-gray-300" href="#">
-            Hosts
-          </a>
-          <a class="hover:text-gray-300" href="#">
-            Contact
-          </a>
-          <a class="hover:text-gray-300" href="#">
-            Search
-          </a>
-          <a class="hover:text-gray-300" href="#">
-            Subscribe
+          <a class="hover:text-gray-300" href="/feed">
+            RSS
           </a>
         </div>
       </div>
