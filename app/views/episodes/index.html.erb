@@ -1,19 +1,13 @@
 <div class="max-w-5xl mx-auto mb-16">
-  <img alt="A person in a brown suit standing against a green tiled wall with urinals" class="w-full mb-3" height="400" src="<%= asset_path("omindex.png")%>" width="1200"/>
-  <h1 class="text-4xl font-bold text-center mb-2">
+<h1 class="text-4xl font-bold text-center mb-2">
     Teahour 2.0
   </h1>
+  <img alt="A person in a brown suit standing against a green tiled wall with urinals" class="w-full mb-3" height="400" src="<%= asset_path("omindex.png")%>" width="1200"/>
+  
   <p class="text-center text-gray-600 mb-4">
   For Full Spectrum Developers
   </p>
-  <div class="flex justify-center space-x-4 text-sm text-gray-500">
-    <span>
-      APPLE POCASTS
-    </span>
-    <span>
-      Spotify
-    </span>
-  </div>
+  <%= render 'shared/subscription_buttons' %>
 </div>
 <!-- About Section -->
 <div class="max-w-5xl mx-auto mb-16 flex gap-16">
