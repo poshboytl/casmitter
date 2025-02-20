@@ -4,18 +4,22 @@ jason:
   name: "Jason"
   bio: "主持人，软件工程师"
   avatar_url: "https://example.com/avatars/jason.jpg"
+  type: "Host"
 
 kevin:
   name: "Kevin"
   bio: "区块链技术专家"
   avatar_url: "https://example.com/avatars/kevin.jpg"
+  type: "Guest"
 
 sarah:
   name: "Sarah"
   bio: "Rust 语言核心贡献者"
   avatar_url: "https://example.com/avatars/sarah.jpg"
+  type: "Guest"
 
 mike:
   name: "Mike"
   bio: "Ruby 社区活跃贡献者"
   avatar_url: "https://example.com/avatars/mike.jpg"
+  type: "Guest"
