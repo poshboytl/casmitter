@@ -1,4 +1,4 @@
-class AddRollToAttendances < ActiveRecord::Migration[8.0]
+class AddRoleToAttendances < ActiveRecord::Migration[8.0]
   def change
     add_column :attendances, :role, :integer
   end
