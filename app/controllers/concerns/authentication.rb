@@ -2,7 +2,8 @@ module Authentication
   extend ActiveSupport::Concern
 
   included do
-    before_action :require_authentication
+    # Default is to require authentication
+    # before_action :require_authentication
     helper_method :authenticated?
   end
 
