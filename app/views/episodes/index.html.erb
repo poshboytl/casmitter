@@ -58,7 +58,7 @@
           #<%= episode.number %> - <%= episode.name %>
         </h3>
         <p class="text-sm text-gray-500">
-        <%= episode.published_at.strftime("%Y-%m-%d") %> | <%= episode.duration / 3600 %> hr <%= (episode.duration % 3600) / 60 %> mins
+          <%= format_episode_duration_and_date(episode) %>
         </p>
       </div>
     <% end %>

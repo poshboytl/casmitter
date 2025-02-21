@@ -1,0 +1,91 @@
+<main class="max-w-5xl mx-auto mb-16">
+  <img alt="Teahour 2.0" class="w-full mb-3" height="400" src="<%= asset_path("omshow.png")%>" width="1200"/>
+  <div class="flex flex-col items-center mt-8 mb-12">
+   <img alt="Profile photo" class="rounded-full w-24 h-24 mb-4" height="100" src="<%= @host.avatar_url %>" width="100"/>
+   <h2 class="text-2xl mb-2">
+    <%= @host.name %>
+   </h2>
+   <p class="text-gray-600 mb-4">
+    <%= @host.bio %>
+   </p>
+   <div class="flex space-x-2">
+    <a class="border border-gray-300 rounded px-3 py-1 text-sm" href="#">
+     weibo
+    </a>
+    <a class="border border-gray-300 rounded px-3 py-1 text-sm" href="#">
+     twitter
+    </a>
+    <a class="border border-gray-300 rounded px-3 py-1 text-sm" href="#">
+     instagram
+    </a>
+   </div>
+  </div>
+  <!-- Episodes Section -->
+  <div class="max-w-4xl mx-auto px-4">
+   <div class="text-center mb-8">
+    <h3 class="text-gray-800">
+     <%= @host.name %> 参加 <%= @host.episodes.count %> 期节目
+    </h3>
+   </div>
+   <!-- Episode List -->
+   <div class="space-y-4">
+    <% @host.episodes.each do |episode| %>
+    <div class="bg-gray-100 p-4 rounded">
+     <h4 class="text-blue-600 hover:underline">
+        <%= episode.name %>
+     </h4>
+     <div class="text-gray-500 text-sm">
+      <%= episode.published_at.strftime("%Y-%m-%d") %> | <%= episode.duration %> mins
+     </div>
+     <p class="text-gray-700 mt-2">
+      <%= episode.summary %>
+     </p>
+    </div>
+    <% end %>
+
+    <div class="bg-gray-100 p-4 rounded">
+     <h4 class="text-blue-600 hover:underline">
+      #84 - Why VSCode is better than Atom?
+     </h4>
+     <div class="text-gray-500 text-sm">
+      December 15th, 2015 | 1h 45 mins
+     </div>
+     <p class="text-gray-700 mt-2">
+      本期節目邀請到了 Philip Liu，在節目裡 VSCode 和 Atom 的比較分析，為什麼 VSCode 比 Atom 更好且更？以及這兩個編輯器。
+     </p>
+    </div>
+    <!-- Continue with more episodes... -->
+    <!-- I'll include a few more to show the pattern -->
+    <div class="bg-gray-100 p-4 rounded">
+     <h4 class="text-blue-600 hover:underline">
+      #83 - 81 BlockChain CEO 談區塊鏈和智能合約
+     </h4>
+     <div class="text-gray-500 text-sm">
+      December 1st, 2015 | 1h 23 mins
+     </div>
+     <p class="text-gray-700 mt-2">
+      本期節目邀請到區塊鏈 BlockChain CEO 來談區塊鏈和智能合約的發展以及 BlockChain 的未來，加密貨幣的前景等等問題。
+     </p>
+    </div>
+    <!-- Add more episodes following the same pattern -->
+   </div>
+   <!-- Pagination -->
+   <div class="flex justify-center mt-8 mb-16 space-x-2">
+    <button class="border border-gray-300 px-4 py-2 rounded">
+     ← PREVIOUS
+    </button>
+    <button class="border border-gray-300 px-4 py-2 rounded">
+     1
+    </button>
+    <button class="border border-gray-300 px-4 py-2 rounded">
+     2
+    </button>
+    <button class="border border-gray-300 px-4 py-2 rounded">
+     3
+    </button>
+    <button class="border border-gray-300 px-4 py-2 rounded">
+     NEXT →
+    </button>
+   </div>
+  </div>
+</main>
