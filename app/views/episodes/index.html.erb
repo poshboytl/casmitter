@@ -55,7 +55,9 @@
     <% @episodes.each do |episode| %>
     <%= link_to episode_path(episode.slug), class: "episode-card block" do %>
       <div>
-        <img alt="Back to Work Episode 644" class="w-full mb-4" height="400" src="<%= asset_path 'logo.png' %>" width="400"/>
+        <img alt="<%= episode.name %>" class="w-full mb-4" height="400" 
+             src="<%= episode.cover_image_url.start_with?('http') ? episode.cover_image_url : asset_path(episode.cover_image_url) %>"
+             width="400"/>
         <h3 class="text-black-500 hover:underline mb-2">
           #<%= episode.number %> - <%= episode.name %>
         </h3>
