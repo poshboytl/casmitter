@@ -32,60 +32,19 @@
     <% @host.episodes.each do |episode| %>
     <div class="bg-gray-100 p-4 rounded">
      <h4 class="text-blue-600 hover:underline">
-        <%= episode.name %>
+        <%= link_to episode.name, episode_path(episode.slug) %>
      </h4>
      <div class="text-gray-500 text-sm">
-      <%= episode.published_at.strftime("%Y-%m-%d") %> | <%= episode.duration %> mins
+      <%= episode.published_at.strftime("%Y-%m-%d") %> | <%= format_episode_duration_and_date(episode) %>
      </div>
+
      <p class="text-gray-700 mt-2">
-      <%= episode.summary %>
+        <%= episode.summary %>
      </p>
     </div>
     <% end %>
-
-    <div class="bg-gray-100 p-4 rounded">
-     <h4 class="text-blue-600 hover:underline">
-      #84 - Why VSCode is better than Atom?
-     </h4>
-     <div class="text-gray-500 text-sm">
-      December 15th, 2015 | 1h 45 mins
-     </div>
-     <p class="text-gray-700 mt-2">
-      本期節目邀請到了 Philip Liu，在節目裡 VSCode 和 Atom 的比較分析，為什麼 VSCode 比 Atom 更好且更？以及這兩個編輯器。
-     </p>
-    </div>
-    <!-- Continue with more episodes... -->
-    <!-- I'll include a few more to show the pattern -->
-    <div class="bg-gray-100 p-4 rounded">
-     <h4 class="text-blue-600 hover:underline">
-      #83 - 81 BlockChain CEO 談區塊鏈和智能合約
-     </h4>
-     <div class="text-gray-500 text-sm">
-      December 1st, 2015 | 1h 23 mins
-     </div>
-     <p class="text-gray-700 mt-2">
-      本期節目邀請到區塊鏈 BlockChain CEO 來談區塊鏈和智能合約的發展以及 BlockChain 的未來，加密貨幣的前景等等問題。
-     </p>
-    </div>
-    <!-- Add more episodes following the same pattern -->
    </div>
-   <!-- Pagination -->
-   <div class="flex justify-center mt-8 mb-16 space-x-2">
-    <button class="border border-gray-300 px-4 py-2 rounded">
-     ← PREVIOUS
-    </button>
-    <button class="border border-gray-300 px-4 py-2 rounded">
-     1
-    </button>
-    <button class="border border-gray-300 px-4 py-2 rounded">
-     2
-    </button>
-    <button class="border border-gray-300 px-4 py-2 rounded">
-     3
-    </button>
-    <button class="border border-gray-300 px-4 py-2 rounded">
-     NEXT →
-    </button>
-   </div>
+   <!-- Episode List END -->
   </div>
+  <!-- Episodes Section END -->
 </main>

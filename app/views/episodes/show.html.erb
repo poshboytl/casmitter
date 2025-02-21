@@ -27,11 +27,16 @@
   <div class="mb-8 flex gap-12">
     <div>
       <h2 class="text-sm font-medium mb-4">
-        Your Hosts
+        <b>Your Hosts</b>
       </h2>
-      <div class="flex gap-2">
+      <div class="flex gap-4">
         <% @hosts.each do |host| %>
-          <img alt="Host 1 profile picture" class="w-10 h-10 rounded-full" height="40" src="<%= host.avatar_url %>" width="40"/>
+          <div class="text-center">
+            <%= link_to host_path(host), class: "block hover:opacity-75" do %>
+              <img alt="<%= host.name %>'s profile picture" class="w-10 h-10 rounded-full mb-2" height="40" src="<%= host.avatar_url %>" width="40"/>
+              <p class="text-sm text-gray-600 hover:text-gray-900"><%= host.name %></p>
+            <% end %>
+          </div>
         <% end %>
       </div>
     </div>
@@ -39,9 +44,14 @@
       <h2 class="text-sm font-medium mb-4">
         Guests
       </h2>
-      <div class="flex gap-2">
+      <div class="flex gap-4">
         <% @guests.each do |guest| %>
-          <img alt="Guest 1 profile picture" class="w-10 h-10 rounded-full" height="40" src="<%= guest.avatar_url %>" width="40"/>
+          <div class="text-center">
+            <%= link_to guest_path(guest), class: "block hover:opacity-75" do %>
+              <img alt="<%= guest.name %>'s profile picture" class="w-10 h-10 rounded-full mb-2" height="40" src="<%= guest.avatar_url %>" width="40"/>
+              <p class="text-sm text-gray-600 hover:text-gray-900"><%= guest.name %></p>
+            <% end %>
+          </div>
         <% end %>
       </div>
     </div>
