@@ -1,6 +1,6 @@
 Rails.application.routes.draw do
   resource :session
-  resources :passwords, param: :token
+  # resources :passwords, param: :token
   resources :episodes
   resources :hosts, only: [:show]
   resources :guests, only: [:show]
