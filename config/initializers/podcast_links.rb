@@ -1,0 +1,1 @@
+PODCAST_LINKS = Rails.application.config_for(:podcast_links) 

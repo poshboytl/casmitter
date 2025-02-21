@@ -1,0 +1,11 @@
+default: &default
+  apple_podcasts: "https://podcasts.apple.com/your-podcast-url"
+  overcast: "https://overcast.fm/your-podcast-url"
+  castro: "https://castro.fm/your-podcast-url"
+  pocket_casts: "https://pocketcasts.com/your-podcast-url"
+
+development:
+  <<: *default
+
+production:
+  <<: *default 
