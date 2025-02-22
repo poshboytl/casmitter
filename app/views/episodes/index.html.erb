@@ -1,5 +1,5 @@
 <div class="max-w-5xl mx-auto mb-16">
-<h1 class="text-4xl font-mono font-bold text-center mb-2 tracking-tight">
+<h1 class="text-4xl font-mono font-bold text-center mb-2">
     Teahour 2.0 Staging
   </h1>
   <img alt="A person in a brown suit standing against a green tiled wall with urinals" class="w-full mb-3" height="400" src="<%= asset_path("omindex.png")%>" width="1200"/>
@@ -10,7 +10,7 @@
   <%= render 'shared/subscription_buttons' %>
 </div>
 <!-- About Section -->
-<div class="max-w-5xl mx-auto mb-16 flex gap-16">
+<div class="max-w-5xl mx-auto mb-16 flex flex-col md:flex-row gap-16 px-4">
   <div class="flex-1">
     <h2 class="font-bold mb-4">
       关于本节目
@@ -27,7 +27,7 @@
       </a>
     </div>
   </div>
-  <div class="w-64">
+  <div class="w-full md:w-64">
     <h2 class="font-bold mb-4">
       Your Hosts
     </h2>
@@ -46,7 +46,7 @@
   </div>
 </div>
 <!-- Episodes Section -->
-<div class="max-w-5xl mx-auto mb-16">
+<div class="max-w-5xl mx-auto mb-16 px-4">
   <h2 class="font-bold mb-8">
     Episodes
   </h2>
