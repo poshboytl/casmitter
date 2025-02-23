@@ -9,15 +9,11 @@
       <%= @guest.bio %>
     </p>
     <div class="flex space-x-2">
-      <a class="border border-gray-300 rounded px-3 py-1 text-sm" href="#">
-        weibo
-      </a>
-      <a class="border border-gray-300 rounded px-3 py-1 text-sm" href="#">
-        twitter
-      </a>
-      <a class="border border-gray-300 rounded px-3 py-1 text-sm" href="#">
-        instagram
-      </a>
+      <% @guest.social_links.each do |key, value| %>
+        <a class="border border-gray-300 rounded px-3 py-1 text-sm" href="<%= value %>">
+          <%= key %>
+        </a>
+      <% end %>
     </div>
   </div>
   

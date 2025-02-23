@@ -6,12 +6,15 @@ Host.delete_all
 
 puts "Creating hosts..."
 terry = Host.create!(name: "Terry Tai", bio: "Co-Host of Teahour", desc: "写代码为生，并以此为乐。",
-  avatar_url: "https://media24.fireside.fm/file/fireside-images-2024/podcasts/images/6/635ad9f1-6ce0-4f31-84cf-030e0c949169/hosts/7/74b2858e-14c6-4e8d-9101-92e94b091570/avatar_small.jpg"
+  avatar_url: "https://media24.fireside.fm/file/fireside-images-2024/podcasts/images/6/635ad9f1-6ce0-4f31-84cf-030e0c949169/hosts/7/74b2858e-14c6-4e8d-9101-92e94b091570/avatar_small.jpg",
+  social_links: { "X" => "https://x.com/poshboytl", "Mastodon" => "https://mastodon.social/@poshboytl",  "Bluesky" => "https://bsky.app/profile/terrytai.bsky.social"}
 )
 
 puts "Creating guests..."
 guest = Guest.create!(name: 'Jan Xie', bio: "Nervos Co-Founder", desc: "行到水穷处，坐看云起时。",
-  avatar_url: "https://media24.fireside.fm/file/fireside-images-2024/podcasts/images/6/635ad9f1-6ce0-4f31-84cf-030e0c949169/guests/1/1e754a88-a9a5-46ec-9216-63fa68d3e63d/avatar_small.jpg")
+  avatar_url: "https://media24.fireside.fm/file/fireside-images-2024/podcasts/images/6/635ad9f1-6ce0-4f31-84cf-030e0c949169/guests/1/1e754a88-a9a5-46ec-9216-63fa68d3e63d/avatar_small.jpg",
+  social_links: { "X" => "https://x.com/busyforking" }
+)
 
 puts "Creating episodes..."
 episode_82 = Episode.create!(
