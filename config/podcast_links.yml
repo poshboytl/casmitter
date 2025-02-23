@@ -1,8 +1,8 @@
 default: &default
-  apple_podcasts: "https://podcasts.apple.com/your-podcast-url"
-  overcast: "https://overcast.fm/your-podcast-url"
-  castro: "https://castro.fm/your-podcast-url"
-  pocket_casts: "https://pocketcasts.com/your-podcast-url"
+  apple_podcasts: "https://podcasts.apple.com/cn/podcast/teahour/id1486623337"
+  overcast: "https://overcast.fm/itunes1486623337/teahour"
+  castro: "https://castro.fm/podcast/ba84cbad-e6bd-41ee-a961-8f70ac073248"
+  pocket_casts: "https://pca.st/0nyfihxq"
 
 development:
   <<: *default

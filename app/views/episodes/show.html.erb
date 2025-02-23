@@ -20,11 +20,7 @@
       Your browser does not support the audio element.
      </audio>
     </div>
-    <div class="flex flex-wrap justify-center gap-4 mt-8 px-4">
-      <%= link_to "APPLE PODCASTS", "#", class: "rounded-full bg-gray-100 px-6 py-3 text-gray-700 hover:bg-gray-200" %>
-      <%= link_to "OVERCAST", "#", class: "rounded-full bg-gray-100 px-6 py-3 text-gray-700 hover:bg-gray-200" %>
-      <%= link_to "CASTRO", "#", class: "rounded-full bg-gray-100 px-6 py-3 text-gray-700 hover:bg-gray-200" %>
-    </div>
+    <%= render 'shared/subscription_buttons' %>
    </div>
   </div>
   <!----- Host begin ----->

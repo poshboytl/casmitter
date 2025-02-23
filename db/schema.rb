@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_02_21_122523) do
+ActiveRecord::Schema[8.0].define(version: 2025_02_23_103644) do
   create_table "attendances", force: :cascade do |t|
     t.integer "attendee_id"
     t.integer "episode_id"
@@ -27,6 +27,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_21_122523) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "avatar_url"
+    t.json "social_links"
   end
 
   create_table "episodes", force: :cascade do |t|
