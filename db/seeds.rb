@@ -42,7 +42,7 @@ episode_79 = Episode.create!(
   slug: '79',
   published_at: DateTime.parse('2015-08-31 14:00:00'),
   duration: 6540,
-  cover_url: ""
+  cover_url: "https://assets.teahour.dev/dl2.jpg"
 )
 
 episode_82 = Episode.create!(
