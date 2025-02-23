@@ -1,0 +1,17 @@
+/* 修改普通文本颜色 */
+body {
+  color: #282f34 !important;
+}
+
+a {
+  color: #23a053;
+}
+
+a:hover {
+  color: #23a053;
+  opacity: 0.8;
+}
+
+a:visited {
+  color: #23a053;
+} 

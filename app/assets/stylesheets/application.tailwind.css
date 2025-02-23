@@ -3,9 +3,3 @@
 @tailwind utilities;
 
 /* ... existing code ... */
-
-@layer base {
-  a {
-    @apply text-black underline;
-  }
-}
