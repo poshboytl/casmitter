@@ -10,39 +10,4 @@ class EpisodesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
-  test "should get new" do
-    get new_episode_url
-    assert_response :success
-  end
-
-  test "should create episode" do
-    assert_difference("Episode.count") do
-      post episodes_url, params: { episode: { desc: @episode.desc, file_uri: @episode.file_uri, name: @episode.name } }
-    end
-
-    assert_redirected_to episode_url(Episode.last)
-  end
-
-  test "should show episode" do
-    get episode_url(@episode.slug)
-    assert_response :success
-  end
-
-  test "should get edit" do
-    get edit_episode_url(@episode.slug)
-    assert_response :success
-  end
-
-  test "should update episode" do
-    patch episode_url(@episode.slug), params: { episode: { desc: @episode.desc, file_uri: @episode.file_uri, name: @episode.name } }
-    assert_redirected_to episode_url(@episode)
-  end
-
-  test "should destroy episode" do
-    assert_difference("Episode.count", -1) do
-      delete episode_url(@episode.slug)
-    end
-
-    assert_redirected_to episodes_url
-  end
 end

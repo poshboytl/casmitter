@@ -1,7 +1,7 @@
 Rails.application.routes.draw do
-  resource :session
+  # resource :session
   # resources :passwords, param: :token
-  resources :episodes
+  resources :episodes, only: [:show, :index]
   resources :hosts, only: [:show]
   resources :guests, only: [:show]
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
