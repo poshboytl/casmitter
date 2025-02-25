@@ -1,0 +1,11 @@
+<div class="bg-gray-100 p-4 rounded">
+  <h4 class="text-blue-600 hover:underline">
+    <%= link_to episode.name, episode_path(episode.slug) %>
+  </h4>
+  <div class="text-gray-500 text-sm">
+    <%= episode.published_at.strftime("%Y-%m-%d") %> | <%= format_episode_duration_and_date(episode) %>
+  </div>
+  <p class="text-gray-700 mt-2">
+    <%= episode.summary %>
+  </p>
+</div> 

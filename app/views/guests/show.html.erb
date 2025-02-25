@@ -1,21 +1,7 @@
-<main class="max-w-5xl mx-auto mb-16">
+<%= render layout: 'shared/page_container' do %>
   <img alt="Teahour 2.0" class="w-full mb-3" height="400" src="<%= asset_path("omshow.png")%>" width="1200"/>
-  <div class="flex flex-col items-center mt-8 mb-12">
-    <img alt="Profile photo" class="rounded-full w-24 h-24 mb-4" height="100" src="<%= @guest.avatar_url %>" width="100"/>
-    <h2 class="text-2xl mb-2">
-      <%= @guest.name %>
-    </h2>
-    <p class="text-gray-600 mb-4">
-      <%= @guest.bio %>
-    </p>
-    <div class="flex space-x-2">
-      <% @guest.social_links.each do |key, value| %>
-        <a class="border border-gray-300 rounded px-3 py-1 text-sm" href="<%= value %>">
-          <%= key %>
-        </a>
-      <% end %>
-    </div>
-  </div>
+  
+  <%= render 'shared/person_header', person: @guest %>
   
   <!-- Episodes Section -->
   <div class="max-w-4xl mx-auto px-4">
@@ -24,23 +10,14 @@
         <%= @guest.name %> 参加 <%= @guest.episodes.count %> 期节目
       </h3>
     </div>
+    
     <!-- Episode List -->
     <div class="space-y-4">
       <% @guest.episodes.each do |episode| %>
-        <div class="bg-gray-100 p-4 rounded">
-          <h4 class="text-blue-600 hover:underline">
-            <%= link_to episode.name, episode_path(episode.slug) %>
-          </h4>
-          <div class="text-gray-500 text-sm">
-            <%= episode.published_at.strftime("%Y-%m-%d") %> | <%= format_episode_duration_and_date(episode) %>
-          </div>
-          <p class="text-gray-700 mt-2">
-            <%= episode.summary %>
-          </p>
-        </div>
+        <%= render 'episodes/episode_list_item', episode: episode %>
       <% end %>
     </div>
     <!-- Episode List END -->
   </div>
   <!-- Episodes Section END -->
-</main> 
+<% end %> 

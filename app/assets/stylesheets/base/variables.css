@@ -1,0 +1,20 @@
+:root {
+  /* 颜色系统 */
+  --color-primary-green: #23a053;
+  --color-primary-text: #282f34;
+  --color-secondary-text: #6b7280;
+  --color-background: #ffffff;
+  --color-card-background: #ffffff;
+  --color-border: #e5e7eb;
+  
+  /* 字体 */
+  --font-family-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-family-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  
+  /* 间距 */
+  --spacing-base: 1rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1.5rem;
+  --spacing-lg: 2rem;
+  --spacing-xl: 3rem;
+} 

@@ -1,0 +1,9 @@
+/* 人物头像样式 */
+.avatar {
+  @apply rounded-full mb-2;
+}
+
+/* 节目列表项 */
+.episode-list-item {
+  @apply border-b border-gray-200 pb-4 mb-4 last:border-0;
+} 

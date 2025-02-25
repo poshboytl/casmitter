@@ -1,0 +1,9 @@
+/* 订阅按钮容器 */
+.subscription-buttons-container {
+  @apply flex justify-center mt-6 space-x-4 flex-wrap;
+}
+
+/* 图标按钮 */
+.icon-button i {
+  @apply mr-2;
+} 

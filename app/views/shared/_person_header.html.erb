@@ -1,0 +1,16 @@
+<div class="flex flex-col items-center mt-8 mb-12">
+  <img alt="<%= person.name %> profile photo" class="rounded-full w-24 h-24 mb-4" height="100" src="<%= person.avatar_url %>" width="100"/>
+  <h2 class="text-2xl mb-2">
+    <%= person.name %>
+  </h2>
+  <p class="text-gray-600 mb-4">
+    <%= person.bio %>
+  </p>
+  <div class="flex space-x-2">
+    <% person.social_links.each do |key, value| %>
+      <a class="border border-gray-300 rounded px-3 py-1 text-sm" href="<%= value %>">
+        <%= key %>
+      </a>
+    <% end %>
+  </div>
+</div> 

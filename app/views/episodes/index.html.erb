@@ -40,6 +40,7 @@
   </p>
   <%= render 'shared/subscription_buttons' %>
 </div>
+
 <!-- About Section -->
 <div class="max-w-5xl mx-auto mb-16 flex flex-col md:flex-row gap-16 px-4">
   <div class="flex-1">
@@ -49,7 +50,6 @@
     <p class="text-gray-600 mb-8">
       程序员喜欢的大型技术类八卦节目。
     </p>
-    
   </div>
   <div class="w-full md:w-64">
     <h2 class="font-bold mb-4">
@@ -57,18 +57,12 @@
     </h2>
     <div class="flex space-x-4">
       <% @hosts.each do |host| %>
-        <div class="text-center">
-          <%= link_to host_path(host) do %>
-            <img alt="<%= host.name %>" class="rounded-full mb-2" height="60" src="<%= host.avatar_url %>" width="60"/>
-            <p class="text-sm text-black">
-              <%= host.name %>
-            </p>
-          <% end %>
-        </div>
+        <%= render 'shared/person_card', person: host, path: host_path(host), size: 60 %>
       <% end %>
     </div>
   </div>
 </div>
+
 <!-- Episodes Section -->
 <div class="max-w-5xl mx-auto mb-16 px-4">
   <h2 class="font-bold mb-8">
@@ -76,20 +70,7 @@
   </h2>
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
     <% @episodes.each do |episode| %>
-      <%= link_to episode_path(episode.slug), class: "episode-card block h-full" do %>
-        <div class="flex flex-col h-full">
-          <img alt="<%= episode.name %>" class="w-full aspect-video object-cover mb-4" 
-               src="<%= episode.cover_image_url.start_with?('http') ? episode.cover_image_url : asset_path(episode.cover_image_url) %>"/>
-          <div class="flex flex-col flex-grow">
-            <h3 class="text-black-500 hover:underline mb-2">
-              #<%= episode.number %> - <%= episode.name %>
-            </h3>
-            <p class="text-sm text-gray-500 mt-auto">
-              <%= format_episode_duration_and_date(episode) %>
-            </p>
-          </div>
-        </div>
-      <% end %>
+      <%= render 'episodes/episode_card', episode: episode %>
     <% end %>
   </div>
 </div>

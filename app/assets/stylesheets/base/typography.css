@@ -1,0 +1,20 @@
+/* 基础排版样式 */
+h1 {
+  @apply text-4xl font-bold mb-4;
+}
+
+h2 {
+  @apply text-2xl font-bold mb-3;
+}
+
+h3 {
+  @apply text-xl font-bold mb-2;
+}
+
+p {
+  @apply mb-4;
+}
+
+pre {
+  @apply font-mono text-sm mb-3 whitespace-pre overflow-x-auto;
+} 

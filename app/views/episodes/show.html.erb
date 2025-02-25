@@ -1,30 +1,25 @@
-<main class="max-w-5xl mx-auto mb-16">
-   <div class="container mx-auto px-4 text-center">
-     <h1 class="text-4xl font-mono font-bold text-gray-700">
-       Teahour 2.0 Staging
-     </h1>
-     <p class="text-xl text-gray-600 mt-4">For Full Spectrum Developers</p>
-   </div>
+<%= render layout: 'shared/page_container' do %>
+  <%= render 'shared/page_header' %>
   <img alt="Teahour 2.0" class="w-full mb-3" height="400" src="<%= asset_path("omshow.png")%>" width="1200"/>
   <div class="bg-white py-12">
-   <div class="container mx-auto px-4 text-center">
-    <h2 class="text-4xl font-bold text-gray-700">
-     <%= @episode.name %>
-    </h2>
-    <p class="text-gray-500 mt-2">
-     Episode <%= @episode.number %> · <%= @episode.published_at.strftime("%Y-%m-%d") %> · <%= @episode.duration / 3600 %> hr <%= (@episode.duration % 3600) / 60 %> mins
-    </p>
-    <div class="mt-4">
-     <audio class="w-full" controls="">
-      <source src="<%= @episode.file_uri %>" type="audio/mpeg"/>
-      Your browser does not support the audio element.
-     </audio>
+    <div class="container mx-auto px-4 text-center">
+      <h2 class="text-4xl font-bold text-gray-700">
+        <%= @episode.name %>
+      </h2>
+      <p class="text-gray-500 mt-2">
+        Episode <%= @episode.number %> · <%= @episode.published_at.strftime("%Y-%m-%d") %> · <%= @episode.duration / 3600 %> hr <%= (@episode.duration % 3600) / 60 %> mins
+      </p>
+      <div class="mt-4">
+        <audio class="w-full" controls="">
+          <source src="<%= @episode.file_uri %>" type="audio/mpeg"/>
+          Your browser does not support the audio element.
+        </audio>
+      </div>
+      <%= render 'shared/subscription_buttons' %>
     </div>
-    <%= render 'shared/subscription_buttons' %>
-   </div>
   </div>
-  <!----- Host begin ----->
-
+  
+  <!-- Host and Guest Section -->
   <div class="mb-8 flex gap-12">
     <div>
       <h2 class="text-sm font-medium mb-4">
@@ -32,12 +27,7 @@
       </h2>
       <div class="flex gap-4">
         <% @hosts.each do |host| %>
-          <div class="text-center">
-            <%= link_to host_path(host), class: "block hover:opacity-75" do %>
-              <img alt="<%= host.name %>'s profile picture" class="w-10 h-10 rounded-full mb-2" height="40" src="<%= host.avatar_url %>" width="40"/>
-              <p class="text-sm text-gray-600 hover:text-gray-900"><%= host.name %></p>
-            <% end %>
-          </div>
+          <%= render 'shared/person_card', person: host, path: host_path(host), size: 40, text_color: 'gray-600' %>
         <% end %>
       </div>
     </div>
@@ -47,12 +37,7 @@
       </h2>
       <div class="flex gap-4">
         <% @guests.each do |guest| %>
-          <div class="text-center">
-            <%= link_to guest_path(guest), class: "block hover:opacity-75" do %>
-              <img alt="<%= guest.name %>'s profile picture" class="w-10 h-10 rounded-full mb-2" height="40" src="<%= guest.avatar_url %>" width="40"/>
-              <p class="text-sm text-gray-600 hover:text-gray-900"><%= guest.name %></p>
-            <% end %>
-          </div>
+          <%= render 'shared/person_card', person: guest, path: guest_path(guest), size: 40, text_color: 'gray-600' %>
         <% end %>
       </div>
     </div>
@@ -72,4 +57,4 @@
     </h2>
     <%= @episode.desc %>
   </div>
-</main>
+<% end %>
