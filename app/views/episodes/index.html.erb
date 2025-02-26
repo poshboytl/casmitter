@@ -1,12 +1,10 @@
 <div class="max-w-5xl mx-auto mb-16">
-  <h1 class="text-4xl font-bold font-mono text-center mb-2">
-    Teahour 2.0 Staging
-  </h1>
+  <%= render 'shared/page_header' %>
+
+  <img alt="Teahour 2.0" class="w-full mb-3" height="400" src="<%= asset_path("omindex.png")%>" width="1200"/>
   
-  <%= render 'shared/neofetch' %>
-  
-  <p class="text-center text-gray-600 mb-4">
-    <b>For Full Spectrum Developers</b>
+  <p class="text-center text-gray-600 mb-4 text-xl">
+    <b>程序是一种媒介，是开发者思想、创造力的延伸</b>
   </p>
   <%= render 'shared/subscription_buttons' %>
 </div>
