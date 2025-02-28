@@ -6,17 +6,17 @@ Host.delete_all
 
 puts "Creating hosts..."
 terry = Host.create!(name: "Terry Tai", bio: "Co-Host of Teahour, Nervos Co-Founder", desc: "写代码为生，并以此为乐。",
-  avatar_url: "https://media24.fireside.fm/file/fireside-images-2024/podcasts/images/6/635ad9f1-6ce0-4f31-84cf-030e0c949169/hosts/7/74b2858e-14c6-4e8d-9101-92e94b091570/avatar_small.jpg",
+  avatar_url: "https://assets.teahour.dev/terry-avatar.jpg",
   social_links: { "X" => "https://x.com/poshboytl", "Mastodon" => "https://mastodon.social/@poshboytl",  "Bluesky" => "https://bsky.app/profile/terrytai.bsky.social"}
 )
 
 jan = Host.create!(name: 'Jan Xie', bio: "Co-Host of Teahour, Nervos Co-Founder", desc: "行到水穷处，坐看云起时。",
-  avatar_url: "https://media24.fireside.fm/file/fireside-images-2024/podcasts/images/6/635ad9f1-6ce0-4f31-84cf-030e0c949169/guests/1/1e754a88-a9a5-46ec-9216-63fa68d3e63d/avatar_small.jpg",
+  avatar_url: "https://assets.teahour.dev/jan-avatar.jpg",
   social_links: { "X" => "https://x.com/busyforking" }
 )
 
 howard = Host.create!(name: 'Howard Wu', bio: "Co-Host of Teahour", desc: "if you do not construct your reality, your reality with be constructed for you",
-  avatar_url: "https://media24.fireside.fm/file/fireside-images-2024/podcasts/images/6/635ad9f1-6ce0-4f31-84cf-030e0c949169/guests/3/324d2d41-2c22-462c-b192-2d4aa3f08703/avatar_small.jpg",
+  avatar_url: "https://assets.teahour.dev/howard-avatar.jpg",
   social_links: { "X" => "https://x.com/hayeah" }
 )
 
