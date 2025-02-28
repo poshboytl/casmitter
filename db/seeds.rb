@@ -15,7 +15,7 @@ jan = Host.create!(name: 'Jan Xie', bio: "Co-Host of Teahour, Nervos Co-Founder"
   social_links: { "X" => "https://x.com/busyforking" }
 )
 
-howard = Host.create!(name: 'Howard Wu', bio: "Co-Host of Teahour", desc: "if you do not construct your reality, your reality with be constructed for you",
+howard = Host.create!(name: 'Howard Ye', bio: "Co-Host of Teahour", desc: "if you do not construct your reality, your reality with be constructed for you",
   avatar_url: "https://assets.teahour.dev/howard-avatar.jpg",
   social_links: { "X" => "https://x.com/hayeah" }
 )
