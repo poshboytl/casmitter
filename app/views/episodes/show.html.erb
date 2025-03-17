@@ -37,7 +37,11 @@
       </h2>
       <div class="flex gap-4">
         <% @guests.each do |guest| %>
-          <%= render 'shared/person_card', person: guest, path: guest_path(guest), size: 60, text_color: 'gray-600' %>
+          <%= render 'shared/person_card', 
+                person: guest, 
+                path: guest.is_a?(Host) ? host_path(guest) : guest_path(guest), 
+                size: 60, 
+                text_color: 'gray-600' %>
         <% end %>
       </div>
     </div>
@@ -55,6 +59,8 @@
     <h2 class="text-xl font-medium mb-4">
       Show Notes
     </h2>
-    <%= @episode.desc %>
+    <div class="[&_ul]:list-disc [&_ul]:ml-4">
+      <%= markdown(@episode.desc) %>
+    </div>
   </div>
 <% end %>
