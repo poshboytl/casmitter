@@ -1,8 +1,8 @@
 default: &default
   apple_podcasts: "https://podcasts.apple.com/us/podcast/teahour-2-0/id1802576529"
   overcast: "https://overcast.fm/itunes1802576529/teahour-2-0"
-  castro: "https://castro.fm/podcast/ba84cbad-e6bd-41ee-a961-8f70ac073248"
-  pocket_casts: "https://pca.st/0nyfihxq"
+  castro: "https://castro.fm/podcast/35f657c1-0bf0-4487-a5a3-7817984e0c09"
+  pocket_casts: "https://pca.st/xlwnigwl"
   spotify: "https://open.spotify.com/show/5JSGb48bZj6VdF2l27BSv1"
 
 development:
