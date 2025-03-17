@@ -27,10 +27,16 @@ puts "Creating guests..."
 
 puts "Creating episodes..."
 
+
+require_relative '../lib/file_utils'
+file_uri = "https://assets.teahour.dev/teahour2_1.mp3"
+file_size = FileUtils.get_remote_file_size(file_uri)
+puts "File size: #{file_size} bytes"
+
 episode_1 = Episode.create!(
   name: "Teahour 2.0 来了！",
-  file_uri: "https://assets.teahour.dev/teahour2_1.mp3",
-  summary: "12 年前 Teahour 诞生了。 12 年后的今天，Teahour 2.0 来了！这一期，新主播们一起摆摆龙门阵。",
+  file_uri: file_uri,
+  summary: "12 年前 Teahour 诞生, 12 年后的今天 Teahour 2.0 来了！这一期，新主播们一起摆摆龙门阵。-- Teahour 2.0 是一档针对程序员播客节目，更是一场思维的探索。 程序不仅仅是工具，它是开发者表达思想、塑造未来的媒介。 我们相信，黑客精神不仅关乎技术，还关乎突破边界、打破规则、重新定义世界。",
   desc: File.read(Rails.root.join('db', 'seeds', 'episode_1_desc.md')),
   status: 1,
   keywords: 'podcast, programmer',
@@ -38,7 +44,8 @@ episode_1 = Episode.create!(
   slug: '1',
   duration: 7242,
   published_at: Time.zone.now,
-  cover_url: "https://assets.teahour.dev/teahour2-logo.jpg"
+  cover_url: "https://assets.teahour.dev/teahour2-logo.jpg",
+  length: file_size
 )
 
 

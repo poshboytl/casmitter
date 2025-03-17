@@ -3,35 +3,36 @@
 ep1:
   name: "聊聊比特币背后的技术和 Blockchain"
   file_uri: "https://casmitter.s3.us-east-2.amazonaws.com/episodes/1.mp3"
-  desc: "聊聊比特币背后的技术和 Blockchain"
+  desc: "- this is a test with markdown"
   summary: "比特币背后的技术和 Blockchain"
   status: 1
   keywords: "比特币,区块链,blockchain,bitcoin"
   number: 1
   slug: "1-bitcoin-and-blockchain"
   published_at: "2024-03-01"
-  duration: 3600
+  duration: 7242
+  length: 115883949
 
 ep2:
   name: "聊聊 Rust 编程语言"
   file_uri: "https://casmitter.s3.us-east-2.amazonaws.com/episodes/2.mp3"
-  desc: "聊聊 Rust 编程语言"
+  desc: "- this is a test with markdown"
   summary: "Rust 编程语言"
   status: 1
-  keywords: "rust,编程语言"
-  number: 2
-  slug: "2-rust-programming-language"
+  keywords: "rust,programming language"
   published_at: "2024-03-10"
   duration: 5400
+  length: 115883949
 
 ep3:
   name: "聊聊 Ruby 和 Rails"
   file_uri: "https://casmitter.s3.us-east-2.amazonaws.com/episodes/3.mp3"
-  desc: "聊聊 Ruby 和 Rails"
+  desc: "- this is a test with markdown"
   summary: "Ruby 和 Rails"
   status: 1
-  keywords: "ruby,rails,编程语言"
+  keywords: "ruby,rails,programming language"
   number: 3
   slug: "3-ruby-and-rails"
   published_at: "2024-03-20"
   duration: 1800
+  length: 115883949

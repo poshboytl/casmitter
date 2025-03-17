@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_02_23_103644) do
+ActiveRecord::Schema[8.0].define(version: 2025_03_17_022700) do
   create_table "attendances", force: :cascade do |t|
     t.integer "attendee_id"
     t.integer "episode_id"
@@ -44,6 +44,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_23_103644) do
     t.datetime "published_at"
     t.integer "duration"
     t.string "cover_url"
+    t.integer "length"
   end
 
   create_table "sessions", force: :cascade do |t|
