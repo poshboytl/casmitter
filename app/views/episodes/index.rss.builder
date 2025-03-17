@@ -9,6 +9,7 @@ xml.rss version: "2.0",
     xml.link "https://teahour.dev/"
     xml.language "zh-CN"
     xml.copyright "Copyright #{Time.current.year} Teahour 2.0"
+    xml.pubDate Episode.published.minimum(:published_at).to_fs(:rfc822)
     xml.lastBuildDate Episode.published.maximum(:published_at).to_fs(:rfc822)
     xml.description "Teahour 2.0 是一档针对程序员播客节目，更是一场思维的探索。 程序不仅仅是工具，它是开发者表达思想、塑造未来的媒介。 我们相信，黑客精神不仅关乎技术，还关乎突破边界、打破规则、重新定义世界。"
     
