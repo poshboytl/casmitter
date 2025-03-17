@@ -35,7 +35,7 @@ xml.rss version: "2.0",
                      length: episode.length, 
                      type: "audio/mpeg"
         xml.guid episode.file_uri
-        xml.link episode_url(episode)
+        xml.link episode_url(episode.slug)
         
         # iTunes tags
         xml.tag!("itunes:title", episode.name)

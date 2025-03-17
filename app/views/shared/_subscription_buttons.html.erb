@@ -1,13 +1,14 @@
 <div class="flex flex-wrap justify-center gap-3 mt-8 px-4">
 
-  <a class="flex items-center bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-full text-sm" href="/feed">
-    <i class="fas fa-rss mr-2"></i>
-    RSS
-  </a>
 
   <a class="flex items-center bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-full text-sm" href="<%= PODCAST_LINKS[:apple_podcasts] %>">
     <i class="fas fa-podcast mr-2"></i>
     APPLE PODCASTS
+  </a>
+
+ <a class="flex items-center bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-full text-sm" href="<%= PODCAST_LINKS[:spotify] %>">
+    <i class="fab fa-spotify mr-2"></i>
+    SPOTIFY
   </a>
 
   <a class="flex items-center bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-full text-sm" href="<%= PODCAST_LINKS[:overcast] %>">
@@ -25,10 +26,16 @@
     POCKET CASTS
   </a>
 
+
   <% if @episode %>
     <a class="flex items-center bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-full text-sm" href="<%= @episode.file_uri %>" download>
       <i class="fas fa-download mr-2"></i>
       DOWNLOAD
     </a>
+  <% else %>
+    <a class="flex items-center bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-full text-sm" href="/feed">
+      <i class="fas fa-rss mr-2"></i>
+      RSS
+    </a>
   <% end %>
-</div> 
+</div>

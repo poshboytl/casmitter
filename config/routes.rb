@@ -1,4 +1,7 @@
 Rails.application.routes.draw do
+  # a workaround for redirecting a wrong episode link to the correct one
+  get 'episodes/167', to: redirect('/episodes/1')
+  
   # resource :session
   # resources :passwords, param: :token
   resources :episodes, only: [:show, :index]
@@ -21,4 +24,5 @@ Rails.application.routes.draw do
   # long live RSS!!!
   get 'feed' => 'episodes#index', :defaults => { :format => 'rss' }
   get 'rss'  => 'episodes#index', :defaults => { :format => 'rss' }
+
 end
