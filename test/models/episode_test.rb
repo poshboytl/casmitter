@@ -15,4 +15,9 @@ class EpisodeTest < ActiveSupport::TestCase
     episode = episodes(:ep1)
     assert_equal "02:00:42", episode.duration_in_hours
   end
+
+  test "should get host names" do
+    episode = episodes(:ep1)
+    assert_equal "Jason, Kevin", episode.attendee_names
+  end
 end

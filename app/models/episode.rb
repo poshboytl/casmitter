@@ -31,5 +31,9 @@ class Episode < ApplicationRecord
     
     format("%02d:%02d:%02d", hours, minutes, seconds)
   end
+
+  def attendee_names
+    attendees.map(&:name).join(', ')
+  end
 end
 

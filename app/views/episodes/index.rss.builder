@@ -38,7 +38,7 @@ xml.rss version: "2.0",
         
         # iTunes tags
         xml.tag!("itunes:title", episode.name)
-        xml.tag!("itunes:author", "Terry Tai, Jan Xie, Howard Ye")
+        xml.tag!("itunes:author", episode.attendee_names)
         xml.tag!("itunes:duration", episode.duration_in_hours)
         xml.tag!("itunes:summary", episode.summary)
         xml.tag!("itunes:explicit", "false")
