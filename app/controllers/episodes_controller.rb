@@ -8,7 +8,9 @@ class EpisodesController < ApplicationController
 
     respond_to do |format|
       format.html
-      format.rss { render layout: false }
+      format.rss do
+        render layout: false, content_type: 'application/xml'
+      end
     end
   end
 
