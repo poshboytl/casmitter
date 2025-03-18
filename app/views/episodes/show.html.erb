@@ -27,7 +27,7 @@
       </h2>
       <div class="flex gap-4">
         <% @hosts.each do |host| %>
-          <%= render 'shared/person_card', person: host, path: host_path(host), size: 60, text_color: 'gray-600' %>
+          <%= render 'shared/person_card', person: host, path: host_path(host), size: 60 %>
         <% end %>
       </div>
     </div>

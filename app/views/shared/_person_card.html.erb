@@ -1,7 +1,7 @@
 <div class="text-center">
   <%= link_to path, class: "block hover:opacity-75" do %>
     <img alt="<%= person.name %>" class="rounded-full mb-2" height="<%= size %>" src="<%= person.avatar_url %>" width="<%= size %>"/>
-    <p class="text-sm text-<%= defined?(text_color) ? text_color : 'black' %>">
+    <p class="text-sm text-gray-600">
       <%= person.name %>
     </p>
   <% end %>
