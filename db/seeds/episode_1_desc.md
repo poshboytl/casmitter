@@ -74,7 +74,7 @@
 
 - [Russian Doll Caching](https://guides.rubyonrails.org/caching_with_rails.html#russian-doll-caching)
 
-- [It Doesn’t Have to Be Crazy alut Work](https://basecamp.com/books#calm)
+- [It Doesn’t Have to Be Crazy at Work](https://basecamp.com/books#calm)
 
 - [Marco Arment](https://marco.org/)
 
