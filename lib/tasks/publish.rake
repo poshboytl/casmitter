@@ -77,6 +77,14 @@ namespace :publish do
 
   end
 
+  desc "Update Episode 3"
+  task update_episode_3: :environment do
+    episode_3 = Episode.find_by(number: 3)
+    episode_3.update(
+      desc: File.read(Rails.root.join('db', 'seeds', 'episode_3_desc.md'))
+    )
+  end
+
   desc "Delete Episode 3" 
   task delete_episode_3: :environment do
     episode_3 = Episode.find_by(number: 3)

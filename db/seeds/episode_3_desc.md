@@ -1,5 +1,7 @@
 - [Clicknow](https://clicknow.ai/)
 
+- [Clicknow - 让你的工作和学习效率翻倍](https://clicknow.ai/blog/clicknow-intro-chinese)
+
 - [捕蛇者说](https://pythonhunter.org/)
 
 - [laike9m](https://x.com/laike9m\_)
