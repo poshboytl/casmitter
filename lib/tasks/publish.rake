@@ -136,4 +136,46 @@ namespace :publish do
     puts "Episode 4 deleted!"
   end
 
+  desc "Publish Episode 5"
+  task episode_5: :environment do
+    terry = Host.find_by(name: "Terry Tai")
+    jan = Host.find_by(name: "Jan Xie")
+    howard = Host.find_by(name: "Howard Ye")
+    ash = Guest.find_or_create_by!(name: "Ash Chen", avatar_url: "https://assets.teahour.dev/ash-avatar.jpg", social_links: {'X' => 'https://x.com/ashchan', 'Website' => 'https://ashchan.com/'})
+    file_uri = "https://assets.teahour.dev/teahour2_5.mp3"
+    file_size = FileUtils.get_remote_file_size(file_uri)
+    puts "File size: #{file_size} bytes"
+
+    episode_5 = Episode.create!(
+      name: "教练，我想写代码！（上）",
+      file_uri: file_uri,
+      summary: "这期和老朋友 Ash Chen 一起聊聊开发者的爱好; 聊聊开发者喜欢的软件硬件;聊聊一辈子做开发吗？...",
+      desc: File.read(Rails.root.join('db', 'seeds', 'episode_5_desc.md')),
+      status: 1,
+      keywords: 'ai, programmer, developer, career, philosophy',
+      number: 5,
+      slug: '5',
+      duration: 6923,
+      published_at: Time.zone.now,
+      cover_url: "https://assets.teahour.dev/teahour2-ep5-cover.png",
+      length: file_size
+    )
+    
+    puts "Creating attendances..."
+    Attendance.create!(attendee: terry, episode: episode_5, role: 0)
+    Attendance.create!(attendee: jan, episode: episode_5, role: 0)
+    Attendance.create!(attendee: howard, episode: episode_5, role: 0)
+    Attendance.create!(attendee: ash, episode: episode_5, role: 1)
+
+    puts "Episode 5 published!"
+  end
+  
+  desc "Delete Episode 5"
+  task delete_episode_5: :environment do
+    episode_5 = Episode.find_by(number: 5)
+    Attendance.where(episode: episode_5).destroy_all
+    episode_5.destroy
+    puts "Episode 5 deleted!"
+  end
+
 end
