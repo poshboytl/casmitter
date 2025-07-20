@@ -20,6 +20,8 @@ ep2:
   summary: "Rust 编程语言"
   status: 1
   keywords: "rust,programming language"
+  number: 2
+  slug: "2-rust-programming-language"
   published_at: "2024-03-10"
   duration: 5400
   length: 115883949
