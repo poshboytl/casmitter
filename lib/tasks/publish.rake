@@ -149,7 +149,7 @@ namespace :publish do
     episode_5 = Episode.create!(
       name: "教练，我想写代码！（上）",
       file_uri: file_uri,
-      summary: "这期和老朋友 Ash Chen 一起聊聊开发者的爱好; 聊聊开发者喜欢的软件硬件;聊聊一辈子做开发吗？...",
+      summary: "这期和老朋友 Ash Chen 一起聊聊开发者的爱好; 聊聊开发者喜欢的软件硬件;聊聊咱能一辈子做开发吗？...",
       desc: File.read(Rails.root.join('db', 'seeds', 'episode_5_desc.md')),
       status: 1,
       keywords: 'ai, programmer, developer, career, philosophy',
