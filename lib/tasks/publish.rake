@@ -47,7 +47,10 @@ namespace :publish do
     terry = Host.find_by(name: "Terry Tai")
     jan = Host.find_by(name: "Jan Xie")
     howard = Host.find_by(name: "Howard Ye")
-    kai = Guest.find_by(name: "Kai Chen") || Guest.create!(name: "Kai Chen", avatar_url: "https://assets.teahour.dev/kai-avatar.jpg", social_links: {'X' => 'https://x.com/_kaichen' })
+    kai = Guest.find_by(name: "Kai Chen")
+    unless kai
+      kai = Guest.create!(name: "Kai Chen", avatar_url: "https://assets.teahour.dev/kai-avatar.jpg", social_links: {'X' => 'https://x.com/_kaichen' })
+    end
     file_uri = "https://assets.teahour.dev/teahour2_3.mp3"
     file_size = FileUtils.get_remote_file_size(file_uri)
     puts "File size: #{file_size} bytes"
@@ -141,7 +144,10 @@ namespace :publish do
     terry = Host.find_by(name: "Terry Tai")
     jan = Host.find_by(name: "Jan Xie")
     howard = Host.find_by(name: "Howard Ye")
-    ash = Guest.find_or_create_by!(name: "Ash Chen", avatar_url: "https://assets.teahour.dev/ash-avatar.jpg", social_links: {'X' => 'https://x.com/ashchan', 'Website' => 'https://ashchan.com/'})
+    ash = Guest.find_by(name: "Ash Chen")
+    unless ash
+      ash = Guest.create!(name: "Ash Chen", avatar_url: "https://assets.teahour.dev/ash-avatar.jpg", social_links: {'X' => 'https://x.com/ashchan', 'Website' => 'https://ashchan.com/'})
+    end
     file_uri = "https://assets.teahour.dev/teahour2_5.mp3"
     file_size = FileUtils.get_remote_file_size(file_uri)
     puts "File size: #{file_size} bytes"
