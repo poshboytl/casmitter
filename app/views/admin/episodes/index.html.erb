@@ -86,6 +86,11 @@
           </tbody>
         </table>
       </div>
+      
+      <!-- Pagination -->
+      <div class="px-6 py-4">
+        <%= render_pagination @episodes %>
+      </div>
     <% else %>
       <div class="text-center py-12">
         <i class="fas fa-podcast text-4xl text-gray-400 mb-4"></i>

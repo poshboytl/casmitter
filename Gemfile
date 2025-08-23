@@ -38,6 +38,9 @@ gem "jbuilder"
 # Text Processing
 gem 'redcarpet'
 
+# Pagination
+gem 'kaminari'
+
 # Deployment & DevOps
 gem "kamal", require: false
 
