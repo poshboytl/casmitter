@@ -1,0 +1,128 @@
+<div class="max-w-4xl mx-auto">
+  <!-- Page Header -->
+  <div class="mb-8">
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-900">New Episode</h1>
+        <p class="mt-2 text-gray-600">Create a new podcast episode</p>
+      </div>
+      <%= link_to admin_episodes_path, class: "text-gray-500 hover:text-gray-700" do %>
+        <i class="fas fa-arrow-left mr-2"></i>Back to Episodes
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Form -->
+  <div class="bg-white shadow rounded-lg">
+    <div class="px-6 py-4 border-b border-gray-200">
+      <h3 class="text-lg font-medium text-gray-900">Episode Details</h3>
+    </div>
+    
+    <%= form_with model: [:admin, @episode], local: true, class: "p-6 space-y-6" do |form| %>
+      <% if @episode.errors.any? %>
+        <div class="bg-red-50 border border-red-200 rounded-md p-4">
+          <div class="flex">
+            <div class="flex-shrink-0">
+              <i class="fas fa-exclamation-triangle text-red-400"></i>
+            </div>
+            <div class="ml-3">
+              <h3 class="text-sm font-medium text-red-800">
+                <%= pluralize(@episode.errors.count, "error") %> prohibited this episode from being saved:
+              </h3>
+              <div class="mt-2 text-sm text-red-700">
+                <ul class="list-disc pl-5 space-y-1">
+                  <% @episode.errors.full_messages.each do |message| %>
+                    <li><%= message %></li>
+                  <% end %>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+
+      <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+        <!-- Episode Name -->
+        <div class="sm:col-span-2">
+          <%= form.label :name, "Episode Title", class: "block text-sm font-medium text-gray-700 mb-2" %>
+          <%= form.text_field :name, class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500", placeholder: "Enter episode title" %>
+        </div>
+
+        <!-- Episode Number -->
+        <div>
+          <%= form.label :number, "Episode Number", class: "block text-sm font-medium text-gray-700 mb-2" %>
+          <%= form.number_field :number, class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500", placeholder: "1" %>
+        </div>
+
+        <!-- Status -->
+        <div>
+          <%= form.label :status, "Status", class: "block text-sm font-medium text-gray-700 mb-2" %>
+          <%= form.select :status, Episode.statuses.keys.map { |s| [s.humanize, s] }, {}, class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" %>
+        </div>
+
+        <!-- Slug -->
+        <div>
+          <%= form.label :slug, "Slug", class: "block text-sm font-medium text-gray-700 mb-2" %>
+          <%= form.text_field :slug, class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500", placeholder: "episode-slug" %>
+        </div>
+
+        <!-- Audio File URI -->
+        <div class="sm:col-span-2">
+          <%= form.label :file_uri, "Audio File URI", class: "block text-sm font-medium text-gray-700 mb-2" %>
+          <%= form.text_field :file_uri, class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500", placeholder: "https://example.com/audio.mp3" %>
+          <p class="mt-1 text-sm text-gray-500">URL to the audio file</p>
+        </div>
+
+        <!-- Duration -->
+        <div>
+          <%= form.label :duration, "Duration (seconds)", class: "block text-sm font-medium text-gray-700 mb-2" %>
+          <%= form.number_field :duration, class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500", placeholder: "3600" %>
+        </div>
+
+        <!-- File Length -->
+        <div>
+          <%= form.label :length, "File Length (bytes)", class: "block text-sm font-medium text-gray-700 mb-2" %>
+          <%= form.number_field :length, class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500", placeholder: "52428800" %>
+          <p class="mt-1 text-sm text-gray-500">File size in bytes</p>
+        </div>
+
+        <!-- Cover URL -->
+        <div>
+          <%= form.label :cover_url, "Cover Image URL", class: "block text-sm font-medium text-gray-700 mb-2" %>
+          <%= form.text_field :cover_url, class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500", placeholder: "https://example.com/cover.jpg" %>
+        </div>
+
+        <!-- Published At -->
+        <div>
+          <%= form.label :published_at, "Published At", class: "block text-sm font-medium text-gray-700 mb-2" %>
+          <%= form.datetime_local_field :published_at, class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" %>
+        </div>
+
+        <!-- Keywords -->
+        <div class="sm:col-span-2">
+          <%= form.label :keywords, "Keywords", class: "block text-sm font-medium text-gray-700 mb-2" %>
+          <%= form.text_field :keywords, class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500", placeholder: "podcast, technology, programming" %>
+        </div>
+
+        <!-- Summary -->
+        <div class="sm:col-span-2">
+          <%= form.label :summary, "Summary", class: "block text-sm font-medium text-gray-700 mb-2" %>
+          <%= form.text_area :summary, rows: 3, class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500", placeholder: "Brief summary of the episode..." %>
+        </div>
+
+        <!-- Description -->
+        <div class="sm:col-span-2">
+          <%= form.label :desc, "Description", class: "block text-sm font-medium text-gray-700 mb-2" %>
+          <%= form.text_area :desc, rows: 6, class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500", placeholder: "Detailed description of the episode content..." %>
+          <p class="mt-1 text-sm text-gray-500">Supports Markdown formatting</p>
+        </div>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200">
+        <%= link_to "Cancel", admin_episodes_path, class: "px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
+        <%= form.submit "Create Episode", class: "px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
+      </div>
+    <% end %>
+  </div>
+</div>

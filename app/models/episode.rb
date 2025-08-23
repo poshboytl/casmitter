@@ -1,6 +1,10 @@
 class Episode < ApplicationRecord
   enum :status,  draft: 0, published: 1, hidden: 2
 
+  validates :name, presence: true
+  validates :number, presence: true, numericality: { only_integer: true, greater_than: 0 }
+  validates :slug, presence: true, uniqueness: true, format: { with: /\A[a-z0-9-]+\z/, message: "can only contain lowercase letters, numbers, and hyphens" }
+
   has_many :attendances
   has_many :attendees, through: :attendances
   has_many :hosts, -> { where(attendances: { role: 'host' }) }, through: :attendances, source: :attendee
