@@ -28,7 +28,7 @@ gem "solid_cable"
 gem "bcrypt", "~> 3.1.7"
 
 # File Upload & Processing
-gem "shrine", "~> 3.6"
+# gem "shrine", "~> 3.6"
 gem "aws-sdk-s3", "~> 1.14"
 # gem "image_processing", "~> 1.2"
 

@@ -30,4 +30,9 @@ Rails.application.routes.draw do
     root to: 'dashboard#index'
     resources :episodes, only: [:index, :new, :create]
   end
+
+  # Presigned URLs API - only for uploading
+  namespace :api do
+    resources :presigned_urls, only: [:create]
+  end
 end
