@@ -27,7 +27,9 @@ class PresignedUploadUrlService
           { bucket: @bucket },
           { key: key },
           { 'Content-Type' => content_type },
-          ['content-length-range', 0, size_limit]
+          ['content-length-range', 0, size_limit],
+          # Add ACL condition to set file as public-read
+          { acl: 'public-read' }
         ]
       }.to_json
 
@@ -47,6 +49,7 @@ class PresignedUploadUrlService
         fields: {
           key: key,
           'Content-Type' => content_type,
+          acl: 'public-read',  # Add ACL field to set file as public
           AWSAccessKeyId: Rails.application.credentials.dig(:s3, :access_key_id),
           policy: policy_base64,
           signature: signature

@@ -7,7 +7,7 @@
         <%= @episode.name %>
       </h2>
       <p class="text-gray-500 mt-2">
-        Episode <%= @episode.number %> · <%= @episode.published_at.strftime("%Y-%m-%d") %> · <%= @episode.duration / 3600 %> hr <%= (@episode.duration % 3600) / 60 %> mins
+        Episode <%= @episode.number %> · <%= @episode.published_at.strftime("%Y-%m-%d") %> · <%= (@episode.duration || 0) / 3600 %> hr <%= (@episode.duration || 0 % 3600) / 60 %> mins
       </p>
       <div class="mt-4">
         <audio class="w-full" controls="">

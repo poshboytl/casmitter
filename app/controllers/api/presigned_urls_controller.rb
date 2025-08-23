@@ -1,8 +1,8 @@
 class Api::PresignedUrlsController < ApplicationController
-  before_action :authenticate_user!
+  before_action :require_admin_authentication
   
   # Generate a presigned URL for uploading a file to S3
-  def upload
+  def create
     key = params[:key]
     content_type = params[:content_type] || 'application/octet-stream'
     expires_in = parse_expires_in(params[:expires_in])
@@ -38,6 +38,12 @@ class Api::PresignedUrlsController < ApplicationController
       expires_in.to_i.seconds
     else
       1.hour
+    end
+  end
+
+  def require_admin_authentication
+    unless authenticated? && Current.user
+      redirect_to new_session_path, alert: "Admin access required"
     end
   end
 end
