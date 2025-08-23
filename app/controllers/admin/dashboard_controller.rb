@@ -1,15 +1,4 @@
-class Admin::DashboardController < ApplicationController
-  layout 'admin'
-  before_action :require_admin_authentication
-
+class Admin::DashboardController < Admin::BaseController
   def index
-  end
-
-  private
-
-  def require_admin_authentication
-    unless authenticated? && Current.user
-      redirect_to new_session_path, alert: "Admin access required"
-    end
   end
 end
