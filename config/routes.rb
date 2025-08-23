@@ -2,7 +2,7 @@ Rails.application.routes.draw do
   # a workaround for redirecting a wrong episode link to the correct one
   get 'episodes/167', to: redirect('/episodes/1')
   
-  # resource :session
+  resource :session, only: [:new, :create, :destroy]
   # resources :passwords, param: :token
   resources :episodes, only: [:show, :index]
   resources :hosts, only: [:show]
