@@ -28,7 +28,7 @@ Rails.application.routes.draw do
   namespace :admin do
     get 'dashboard', to: 'dashboard#index'
     root to: 'dashboard#index'
-    resources :episodes, only: [:index, :new, :create]
+    resources :episodes, only: [:index, :new, :create, :edit, :update, :destroy]
   end
 
   # Presigned URLs API - only for uploading

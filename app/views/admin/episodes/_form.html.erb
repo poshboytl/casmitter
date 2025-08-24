@@ -1,0 +1,171 @@
+<%= form_with model: [:admin, @episode], local: true, class: "p-6 space-y-6" do |form| %>
+  <% if @episode.errors.any? %>
+    <div class="bg-red-50 border border-red-200 rounded-md p-4">
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <i class="fas fa-exclamation-triangle text-red-400"></i>
+        </div>
+        <div class="ml-3">
+          <h3 class="text-sm font-medium text-red-800">
+            <%= pluralize(@episode.errors.count, "error") %> prohibited this episode from being saved:
+          </h3>
+          <div class="mt-2 text-sm text-red-700">
+            <ul class="list-disc pl-5 space-y-1">
+              <% @episode.errors.full_messages.each do |message| %>
+                <li><%= message %></li>
+              <% end %>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+    <!-- Episode Name -->
+    <div class="sm:col-span-2">
+      <%= form.label :name, "Episode Title", class: "block text-sm font-medium text-gray-700 mb-2" %>
+      <%= form.text_field :name, class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500", placeholder: "Enter episode title" %>
+    </div>
+
+    <!-- Episode Number -->
+    <div>
+      <%= form.label :number, "Episode Number", class: "block text-sm font-medium text-gray-700 mb-2" %>
+      <%= form.number_field :number, class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500", placeholder: "1" %>
+    </div>
+
+    <!-- Status -->
+    <div>
+      <%= form.label :status, "Status", class: "block text-sm font-medium text-gray-700 mb-2" %>
+      <%= form.select :status, Episode.statuses.keys.map { |s| [s.humanize, s] }, {}, class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" %>
+    </div>
+
+    <!-- Slug -->
+    <div>
+      <%= form.label :slug, "Slug", class: "block text-sm font-medium text-gray-700 mb-2" %>
+      <%= form.text_field :slug, class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500", placeholder: "episode-slug" %>
+    </div>
+
+    <!-- File Drag & Drop Upload Area -->
+    <div class="sm:col-span-2 mb-6" 
+         data-controller="file-upload"
+         data-file-upload-max-file-size-value="100000000"
+         data-file-upload-allowed-types-value='["audio/mpeg", "audio/wav", "audio/m4a", "audio/aac"]'>
+      <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors duration-200" 
+           data-file-upload-target="dropZone">
+        
+        <!-- Default State -->
+        <div data-file-upload-target="default" class="space-y-3">
+          <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+          <div class="text-gray-600">
+            <label for="file-upload" class="cursor-pointer">
+              <span class="font-medium text-blue-600 hover:text-blue-500">Click to select file</span>
+              <span class="text-gray-500"> or drag file here</span>
+            </label>
+            <input data-file-upload-target="fileInput" id="file-upload" name="file-upload" type="file" class="sr-only" accept="audio/*" />
+          </div>
+          <p class="text-xs text-gray-500">Supports MP3, WAV, M4A and other audio formats</p>
+        </div>
+
+        <!-- Drag Over State -->
+        <div data-file-upload-target="dragOver" class="space-y-3 hidden">
+          <svg class="mx-auto h-12 w-12 text-blue-500" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+          <p class="text-blue-600 font-medium">Release mouse to upload file</p>
+        </div>
+
+        <!-- Upload Progress State -->
+        <div data-file-upload-target="uploading" class="space-y-3 hidden">
+          <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p class="text-blue-600 font-medium">Uploading...</p>
+          <div class="w-full bg-gray-200 rounded-full h-2">
+            <div class="bg-blue-600 h-2 rounded-full transition-all duration-300" style="width: 0%" data-file-upload-target="progressBar"></div>
+          </div>
+          <p class="text-sm text-gray-500" data-file-upload-target="status">Preparing upload</p>
+        </div>
+
+        <!-- Upload Success State -->
+        <div data-file-upload-target="success" class="space-y-3 hidden">
+          <svg class="mx-auto h-12 w-12 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+          </svg>
+          <p class="text-green-600 font-medium">Upload successful!</p>
+          <p class="text-sm text-gray-500" data-file-upload-target="fileInfo"></p>
+          <button type="button" class="text-sm text-blue-600 hover:text-blue-500" data-action="click->file-upload#reset">Upload another file</button>
+        </div>
+
+        <!-- Upload Error State -->
+        <div data-file-upload-target="error" class="space-y-3 hidden">
+          <svg class="mx-auto h-12 w-12 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <p class="text-red-600 font-medium">Upload failed</p>
+          <p class="text-sm text-gray-500" data-file-upload-target="errorMessage"></p>
+          <button type="button" class="text-sm text-blue-600 hover:text-blue-500" data-action="click->file-upload#reset">Retry</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Audio File URI -->
+    <div class="sm:col-span-2">
+      <%= form.label :file_uri, "Audio File URI", class: "block text-sm font-medium text-gray-700 mb-2" %>
+      <%= form.text_field :file_uri, class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500", placeholder: "https://example.com/audio.mp3" %>
+      <p class="mt-1 text-sm text-gray-500">URL to the audio file</p>
+    </div>
+
+    <!-- Duration -->
+    <div>
+      <%= form.label :duration, "Duration (seconds)", class: "block text-sm font-medium text-gray-700 mb-2" %>
+      <%= form.number_field :duration, class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500", placeholder: "3600" %>
+    </div>
+
+    <!-- File Length -->
+    <div>
+      <%= form.label :length, "File Length (bytes)", class: "block text-sm font-medium text-gray-700 mb-2" %>
+      <%= form.number_field :length, class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500", placeholder: "52428800" %>
+      <p class="mt-1 text-sm text-gray-500">File size in bytes</p>
+    </div>
+
+    <!-- Cover URL -->
+    <div>
+      <%= form.label :cover_url, "Cover Image URL", class: "block text-sm font-medium text-gray-700 mb-2" %>
+      <%= form.text_field :cover_url, class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500", placeholder: "https://example.com/cover.jpg" %>
+    </div>
+
+    <!-- Published At -->
+    <div>
+      <%= form.label :published_at, "Published At", class: "block text-sm font-medium text-gray-700 mb-2" %>
+      <%= form.datetime_local_field :published_at, class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" %>
+    </div>
+
+    <!-- Keywords -->
+    <div class="sm:col-span-2">
+      <%= form.label :keywords, "Keywords", class: "block text-sm font-medium text-gray-700 mb-2" %>
+      <%= form.text_field :keywords, class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500", placeholder: "podcast, technology, programming" %>
+    </div>
+
+    <!-- Summary -->
+    <div class="sm:col-span-2">
+      <%= form.label :summary, "Summary", class: "block text-sm font-medium text-gray-700 mb-2" %>
+      <%= form.text_area :summary, rows: 3, class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500", placeholder: "Brief summary of the episode..." %>
+    </div>
+
+    <!-- Description -->
+    <div class="sm:col-span-2">
+      <%= form.label :desc, "Description", class: "block text-sm font-medium text-gray-700 mb-2" %>
+      <%= form.text_area :desc, rows: 6, class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500", placeholder: "Detailed description of the episode content..." %>
+      <p class="mt-1 text-sm text-gray-500">Supports Markdown formatting</p>
+    </div>
+  </div>
+
+  <!-- Form Actions -->
+  <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200">
+    <%= link_to "Cancel", admin_episodes_path, class: "px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
+    <%= form.submit submit_text, class: "px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
+  </div>
+<% end %>
+
+

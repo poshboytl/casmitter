@@ -76,9 +76,15 @@
                     <%= link_to "View", episode_path(episode), 
                         class: "text-blue-600 hover:text-blue-900" %>
                     <span class="text-gray-300">|</span>
-                    <a href="#" class="text-green-600 hover:text-green-900">Edit</a>
+                    <%= link_to "Edit", edit_admin_episode_path(episode), 
+                        class: "text-green-600 hover:text-green-900" %>
                     <span class="text-gray-300">|</span>
-                    <a href="#" class="text-red-600 hover:text-red-900">Delete</a>
+                    <%= link_to "Delete", admin_episode_path(episode), 
+                        data: { 
+                          turbo_method: :delete,
+                          controller: "delete-confirmation"
+                        },
+                        class: "text-red-600 hover:text-red-900" %>
                   </div>
                 </td>
               </tr>

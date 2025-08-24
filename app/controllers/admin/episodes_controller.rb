@@ -17,6 +17,27 @@ class Admin::EpisodesController < Admin::BaseController
     end
   end
 
+  def edit
+    @episode = Episode.find(params[:id])
+  end
+
+  def update
+    @episode = Episode.find(params[:id])
+    
+    if @episode.update(episode_params)
+      redirect_to admin_episodes_path, notice: 'Episode was successfully updated.'
+    else
+      render :edit, status: :unprocessable_entity
+    end
+  end
+
+  def destroy
+    @episode = Episode.find(params[:id])
+    @episode.destroy
+    
+    redirect_to admin_episodes_path, notice: 'Episode was successfully deleted.'
+  end
+
   private
 
   def episode_params
