@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { Howl } from 'howler'
 
 export default class extends Controller {
   static targets = [
@@ -12,7 +13,10 @@ export default class extends Controller {
     "status",
     "fileInfo",
     "errorMessage",
-    "fileInput"
+    "fileInput",
+    "ready",
+    "uploadButton",
+    "readyInfo"
   ]
 
   static values = {
@@ -37,6 +41,9 @@ export default class extends Controller {
     // Ensure default state is shown initially
     this.hideAllStates()
     this.defaultTarget.classList.remove('hidden')
+    if (this.hasUploadButtonTarget) {
+      this.uploadButtonTarget.classList.add('hidden')
+    }
     
     console.log('Initial state set to default')
     console.log('Default target hidden class:', this.defaultTarget.classList.contains('hidden'))
@@ -57,6 +64,11 @@ export default class extends Controller {
     if (this.hasFileInputTarget) {
       this.fileInputTarget.addEventListener('change', this.handleFileInput.bind(this))
     }
+
+    // Upload button click
+    if (this.hasUploadButtonTarget) {
+      this.uploadButtonTarget.addEventListener('click', this.uploadCurrentFile.bind(this))
+    }
   }
 
   removeEventListeners() {
@@ -68,6 +80,10 @@ export default class extends Controller {
     // Remove change event listener for file input
     if (this.hasFileInputTarget) {
       this.fileInputTarget.removeEventListener('change', this.handleFileInput.bind(this))
+    }
+
+    if (this.hasUploadButtonTarget) {
+      this.uploadButtonTarget.removeEventListener('click', this.uploadCurrentFile.bind(this))
     }
   }
 
@@ -121,8 +137,7 @@ export default class extends Controller {
     }
 
     this.currentFile = file
-    this.showUploadingState()
-    this.uploadFile(file)
+    this.showReadyState(file)
   }
 
   validateFile(file) {
@@ -137,6 +152,36 @@ export default class extends Controller {
       this.showError(`Unsupported file type: ${file.type}`)
       return false
     }
+
+    // get the file size in bytes and fill the file_size field
+    const fileSizeInBytes = file.size
+    console.log('File size in bytes:', fileSizeInBytes)
+    const lengthField = document.querySelector('input[name="episode[length]"]')
+    if (lengthField) {
+      lengthField.value = fileSizeInBytes
+    }
+
+    // get the file duration in seconds
+    const url = URL.createObjectURL(file)
+    const sound = new Howl({
+      src: [url],
+      format: (file.name.toLowerCase().match(/\.([a-z0-9]+)$/) || [])[1],
+      html5: true,
+      preload: true,
+      onload: () => {
+        const durationSec = sound.duration()
+        console.log('File duration in seconds:', durationSec)
+        const durationField = document.querySelector('input[name="episode[duration]"]')
+        if (durationField && Number.isFinite(durationSec)) durationField.value = Math.round(durationSec)
+        URL.revokeObjectURL(url)
+        sound.unload()
+      },
+      onloaderror: (_id, err) => {
+        console.warn('Failed to load audio for duration:', err)
+        URL.revokeObjectURL(url)
+        sound.unload()
+      }
+    })
 
     return true
   }
@@ -160,6 +205,15 @@ export default class extends Controller {
       console.error('Upload error:', error)
               this.showError(error.message || 'Upload failed')
     }
+  }
+
+  uploadCurrentFile() {
+    if (!this.currentFile) {
+      this.showError('No file selected')
+      return
+    }
+    this.showUploadingState()
+    this.uploadFile(this.currentFile)
   }
 
   async getPresignedUrl(file) {
@@ -252,6 +306,22 @@ export default class extends Controller {
           this.statusTarget.textContent = 'Preparing upload...'
   }
 
+  showReadyState(file) {
+    this.hideAllStates()
+    if (this.hasReadyTarget) {
+      this.readyTarget.classList.remove('hidden')
+    }
+    if (this.hasReadyInfoTarget && file) {
+      this.readyInfoTarget.textContent = `${file.name} (${this.formatFileSize(file.size)})`
+    }
+    if (this.hasUploadButtonTarget) {
+      this.uploadButtonTarget.classList.remove('hidden')
+    }
+    if (this.hasStatusTarget) {
+      this.statusTarget.textContent = 'Ready to upload'
+    }
+  }
+
   showSuccessState(file, presignedUrl) {
     this.hideAllStates()
     this.successTarget.classList.remove('hidden')
@@ -308,6 +378,10 @@ export default class extends Controller {
     // Reset progress bar
     if (this.hasProgressBarTarget) {
       this.progressBarTarget.style.width = '0%'
+    }
+
+    if (this.hasUploadButtonTarget) {
+      this.uploadButtonTarget.classList.add('hidden')
     }
   }
 
