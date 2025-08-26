@@ -15,7 +15,7 @@ class Episode < ApplicationRecord
   scope :published, -> { where(status: :published) }
 
   def cover_image_url
-    cover_url.presence || 'logo.png'
+    cover_url.presence || ActionController::Base.helpers.asset_path('logo.png')
   end
 
   def summary_with_desc
