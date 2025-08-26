@@ -25,6 +25,8 @@ Rails.application.routes.draw do
   get 'feed' => 'episodes#index', :defaults => { :format => 'rss' }
   get 'rss'  => 'episodes#index', :defaults => { :format => 'rss' }
 
+  get 'login', to: 'sessions#new'
+
   namespace :admin do
     get 'dashboard', to: 'dashboard#index'
     root to: 'dashboard#index'
