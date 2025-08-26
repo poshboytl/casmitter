@@ -1,38 +1,24 @@
 <%= form_with model: [:admin, @episode], local: true, class: "p-6 space-y-6" do |form| %>
-  <% if @episode.errors.any? %>
-    <div class="bg-red-50 border border-red-200 rounded-md p-4">
-      <div class="flex">
-        <div class="flex-shrink-0">
-          <i class="fas fa-exclamation-triangle text-red-400"></i>
-        </div>
-        <div class="ml-3">
-          <h3 class="text-sm font-medium text-red-800">
-            <%= pluralize(@episode.errors.count, "error") %> prohibited this episode from being saved:
-          </h3>
-          <div class="mt-2 text-sm text-red-700">
-            <ul class="list-disc pl-5 space-y-1">
-              <% @episode.errors.full_messages.each do |message| %>
-                <li><%= message %></li>
-              <% end %>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-  <% end %>
 
   <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
     <!-- Episode Name -->
     <div class="sm:col-span-2">
-      <%= form.label :name, "Episode Title", class: "block text-sm font-medium text-gray-700 mb-2" %>
-      <%= form.text_field :name, class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500", placeholder: "Enter episode title" %>
+      <%= form.label :name, "Episode Title", class: "block text-sm font-medium text-gray-700 mb-2" do %>
+        Episode Title <span class="text-red-500">*</span>
+      <% end %>
+      <%= form.text_field :name, class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 #{'border-red-500' if @episode.errors[:name].any?}", placeholder: "Enter episode title" %>
+      <% if @episode.errors[:name].any? %>
+        <p class="mt-1 text-sm text-red-600"><%= @episode.errors[:name].join(', ') %></p>
+      <% end %>
     </div>
 
     <!-- Episode Number -->
     <div>
       <%= form.label :number, "Episode Number", class: "block text-sm font-medium text-gray-700 mb-2" %>
-      <%= form.number_field :number, class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500", placeholder: @suggested_number ? "Suggested: #{@suggested_number}" : "1" %>
-      <% if @suggested_number && @episode.draft? %>
+      <%= form.number_field :number, class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 #{'border-red-500' if @episode.errors[:number].any?}", placeholder: @suggested_number ? "Suggested: #{@suggested_number}" : "1" %>
+      <% if @episode.errors[:number].any? %>
+        <p class="mt-1 text-sm text-red-600"><%= @episode.errors[:number].join(', ') %></p>
+      <% elsif @suggested_number && @episode.draft? %>
         <p class="mt-1 text-sm text-gray-500">Next available number: <%= @suggested_number %> (will auto-assign if left empty when publishing)</p>
       <% end %>
     </div>
@@ -40,13 +26,21 @@
     <!-- Status -->
     <div>
       <%= form.label :status, "Status", class: "block text-sm font-medium text-gray-700 mb-2" %>
-      <%= form.select :status, Episode.statuses.keys.map { |s| [s.humanize, s] }, {}, class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" %>
+      <%= form.select :status, Episode.statuses.keys.map { |s| [s.humanize, s] }, {}, class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 #{'border-red-500' if @episode.errors[:status].any?}" %>
+      <% if @episode.errors[:status].any? %>
+        <p class="mt-1 text-sm text-red-600"><%= @episode.errors[:status].join(', ') %></p>
+      <% end %>
     </div>
 
     <!-- Slug -->
     <div>
-      <%= form.label :slug, "Slug", class: "block text-sm font-medium text-gray-700 mb-2" %>
-      <%= form.text_field :slug, class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500", placeholder: "episode-slug" %>
+      <%= form.label :slug, "Slug", class: "block text-sm font-medium text-gray-700 mb-2" do %>
+        Slug <span class="text-red-500">*</span>
+      <% end %>
+      <%= form.text_field :slug, class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 #{'border-red-500' if @episode.errors[:slug].any?}", placeholder: "episode-slug" %>
+      <% if @episode.errors[:slug].any? %>
+        <p class="mt-1 text-sm text-red-600"><%= @episode.errors[:slug].join(', ') %></p>
+      <% end %>
     </div>
 
     <!-- File Drag & Drop Upload Area -->
@@ -124,51 +118,75 @@
     <!-- Audio File URI -->
     <div class="sm:col-span-2">
       <%= form.label :file_uri, "Audio File URI", class: "block text-sm font-medium text-gray-700 mb-2" %>
-      <%= form.text_field :file_uri, class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500", placeholder: "https://example.com/audio.mp3" %>
+      <%= form.text_field :file_uri, class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 #{'border-red-500' if @episode.errors[:file_uri].any?}", placeholder: "https://example.com/audio.mp3" %>
+      <% if @episode.errors[:file_uri].any? %>
+        <p class="mt-1 text-sm text-red-600"><%= @episode.errors[:file_uri].join(', ') %></p>
+      <% end %>
       <p class="mt-1 text-sm text-gray-500">URL to the audio file</p>
     </div>
 
     <!-- Duration -->
     <div>
       <%= form.label :duration, "Duration (seconds)", class: "block text-sm font-medium text-gray-700 mb-2" %>
-      <%= form.number_field :duration, class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500", placeholder: "3600" %>
+      <%= form.number_field :duration, class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 #{'border-red-500' if @episode.errors[:duration].any?}", placeholder: "3600" %>
+      <% if @episode.errors[:duration].any? %>
+        <p class="mt-1 text-sm text-red-600"><%= @episode.errors[:duration].join(', ') %></p>
+      <% end %>
     </div>
 
     <!-- File Length -->
     <div>
       <%= form.label :length, "File Length (bytes)", class: "block text-sm font-medium text-gray-700 mb-2" %>
-      <%= form.number_field :length, class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500", placeholder: "52428800" %>
+      <%= form.number_field :length, class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 #{'border-red-500' if @episode.errors[:length].any?}", placeholder: "52428800" %>
+      <% if @episode.errors[:length].any? %>
+        <p class="mt-1 text-sm text-red-600"><%= @episode.errors[:length].join(', ') %></p>
+      <% end %>
       <p class="mt-1 text-sm text-gray-500">File size in bytes</p>
     </div>
 
     <!-- Cover URL -->
     <div>
       <%= form.label :cover_url, "Cover Image URL", class: "block text-sm font-medium text-gray-700 mb-2" %>
-      <%= form.text_field :cover_url, class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500", placeholder: "https://example.com/cover.jpg" %>
+      <%= form.text_field :cover_url, class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 #{'border-red-500' if @episode.errors[:cover_url].any?}", placeholder: "https://example.com/cover.jpg" %>
+      <% if @episode.errors[:cover_url].any? %>
+        <p class="mt-1 text-sm text-red-600"><%= @episode.errors[:cover_url].join(', ') %></p>
+      <% end %>
     </div>
 
     <!-- Published At -->
     <div>
       <%= form.label :published_at, "Published At", class: "block text-sm font-medium text-gray-700 mb-2" %>
-      <%= form.datetime_local_field :published_at, class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" %>
+      <%= form.datetime_local_field :published_at, class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 #{'border-red-500' if @episode.errors[:published_at].any?}" %>
+      <% if @episode.errors[:published_at].any? %>
+        <p class="mt-1 text-sm text-red-600"><%= @episode.errors[:published_at].join(', ') %></p>
+      <% end %>
     </div>
 
     <!-- Keywords -->
     <div class="sm:col-span-2">
       <%= form.label :keywords, "Keywords", class: "block text-sm font-medium text-gray-700 mb-2" %>
-      <%= form.text_field :keywords, class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500", placeholder: "podcast, technology, programming" %>
+      <%= form.text_field :keywords, class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 #{'border-red-500' if @episode.errors[:keywords].any?}", placeholder: "podcast, technology, programming" %>
+      <% if @episode.errors[:keywords].any? %>
+        <p class="mt-1 text-sm text-red-600"><%= @episode.errors[:keywords].join(', ') %></p>
+      <% end %>
     </div>
 
     <!-- Summary -->
     <div class="sm:col-span-2">
       <%= form.label :summary, "Summary", class: "block text-sm font-medium text-gray-700 mb-2" %>
-      <%= form.text_area :summary, rows: 3, class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500", placeholder: "Brief summary of the episode..." %>
+      <%= form.text_area :summary, rows: 3, class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 #{'border-red-500' if @episode.errors[:summary].any?}", placeholder: "Brief summary of the episode..." %>
+      <% if @episode.errors[:summary].any? %>
+        <p class="mt-1 text-sm text-red-600"><%= @episode.errors[:summary].join(', ') %></p>
+      <% end %>
     </div>
 
     <!-- Description -->
     <div class="sm:col-span-2">
       <%= form.label :desc, "Description", class: "block text-sm font-medium text-gray-700 mb-2" %>
-      <%= form.text_area :desc, rows: 6, class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500", placeholder: "Detailed description of the episode content..." %>
+      <%= form.text_area :desc, rows: 6, class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 #{'border-red-500' if @episode.errors[:desc].any?}", placeholder: "Detailed description of the episode content..." %>
+      <% if @episode.errors[:desc].any? %>
+        <p class="mt-1 text-sm text-red-600"><%= @episode.errors[:desc].join(', ') %></p>
+      <% end %>
       <p class="mt-1 text-sm text-gray-500">Supports Markdown formatting</p>
     </div>
   </div>

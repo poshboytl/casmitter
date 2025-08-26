@@ -10,7 +10,7 @@ class Episode < ApplicationRecord
   has_many :hosts, -> { where(attendances: { role: 'host' }) }, through: :attendances, source: :attendee
   has_many :guests, -> { where(attendances: { role: 'guest' }) }, through: :attendances, source: :attendee
 
-  before_save :auto_assign_number, if: :status_changed_to_published?
+  before_save :auto_assign_published_fields, if: :status_changed_to_published?
 
   scope :published, -> { where(status: :published) }
 
@@ -55,7 +55,8 @@ class Episode < ApplicationRecord
     status_changed? && published? && !status_was.to_s.inquiry.published?
   end
 
-  def auto_assign_number
+  def auto_assign_published_fields
+    # Auto-assign episode number if blank
     if number.blank?
       max_retry = 5
       retry_count = 0
@@ -67,6 +68,11 @@ class Episode < ApplicationRecord
         retry if retry_count < max_retry
         raise
       end
+    end
+    
+    # Auto-assign published_at if blank (only if it's truly nil or empty string)
+    if published_at.nil? || published_at == ""
+      self.published_at = Time.current
     end
   end
 end
