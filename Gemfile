@@ -47,10 +47,11 @@ gem "kamal", require: false
 # Platform Specific
 gem "tzinfo-data", platforms: %i[ windows jruby ]
 
+gem "web-console", group: :development
+
 group :development, :test do
   # Debugging & Development Tools
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
-  gem "web-console", group: :development
 
   # Security & Code Quality
   gem "brakeman", require: false

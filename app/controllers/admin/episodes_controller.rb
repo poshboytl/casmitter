@@ -5,6 +5,7 @@ class Admin::EpisodesController < Admin::BaseController
 
   def new
     @episode = Episode.new
+    @suggested_number = Episode.next_available_number
   end
 
   def create
@@ -13,12 +14,14 @@ class Admin::EpisodesController < Admin::BaseController
     if @episode.save
       redirect_to admin_episodes_path, notice: 'Episode was successfully created.'
     else
+      @suggested_number = Episode.next_available_number
       render :new, status: :unprocessable_entity
     end
   end
 
   def edit
     @episode = Episode.find(params[:id])
+    @suggested_number = @episode.draft? ? Episode.next_available_number : @episode.number
   end
 
   def update
@@ -27,8 +30,13 @@ class Admin::EpisodesController < Admin::BaseController
     if @episode.update(episode_params)
       redirect_to admin_episodes_path, notice: 'Episode was successfully updated.'
     else
+      @suggested_number = @episode.draft? ? Episode.next_available_number : @episode.number
       render :edit, status: :unprocessable_entity
     end
+  rescue ActiveRecord::RecordNotUnique
+    @episode.errors.add(:number, "has already been used by another published episode")
+    @suggested_number = Episode.next_available_number
+    render :edit, status: :unprocessable_entity
   end
 
   def destroy

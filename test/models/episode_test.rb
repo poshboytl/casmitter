@@ -20,4 +20,13 @@ class EpisodeTest < ActiveSupport::TestCase
     episode = episodes(:ep1)
     assert_equal "Jason, Kevin", episode.attendee_names
   end
+
+  test "the number should +1" do
+
+    max = Episode.maximum(:number)
+    episode = Episode.new(name: "Hello World! again!", slug: 'hwa')
+    assert_equal max, Episode.maximum(:number)
+    episode.update status: :published
+    assert_equal max + 1, Episode.maximum(:number)
+  end
 end
