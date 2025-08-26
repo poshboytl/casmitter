@@ -9,3 +9,57 @@
  * Consider organizing styles into separate files for maintainability.
  */
 
+/* Admin 按钮样式 */
+.admin-button {
+  display: inline-flex !important;
+  align-items: center !important;
+  padding: 0.375rem 0.75rem !important;
+  font-size: 0.75rem !important;
+  font-weight: 500 !important;
+  color: white !important;
+  border-radius: 0.375rem !important;
+  transition: all 0.2s !important;
+  text-decoration: none !important;
+  border: none !important;
+  cursor: pointer !important;
+}
+
+.admin-button-primary {
+  background-color: #2563eb !important;
+}
+
+.admin-button-primary:hover {
+  background-color: #1d4ed8 !important;
+}
+
+.admin-button-success {
+  background-color: #16a34a !important;
+}
+
+.admin-button-success:hover {
+  background-color: #15803d !important;
+}
+
+.admin-button-danger {
+  background-color: #dc2626 !important;
+}
+
+.admin-button-danger:hover {
+  background-color: #b91c1c !important;
+}
+
+.admin-button-warning {
+  background-color: #ca8a04 !important;
+}
+
+.admin-button-warning:hover {
+  background-color: #a16207 !important;
+}
+
+.admin-button-secondary {
+  background-color: #4b5563 !important;
+}
+
+.admin-button-secondary:hover {
+  background-color: #374151 !important;
+}

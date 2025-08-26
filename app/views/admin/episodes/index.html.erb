@@ -47,19 +47,34 @@
                   #<%= episode.number %>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
-                  <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
-                    <%= case episode.status
-                        when 'published'
-                          'bg-green-100 text-green-800'
-                        when 'draft'
-                          'bg-yellow-100 text-yellow-800'
-                        when 'hidden'
-                          'bg-red-100 text-red-800'
-                        else
-                          'bg-gray-100 text-gray-800'
-                        end %>">
-                    <%= episode.status.humanize %>
-                  </span>
+                  <div class="flex flex-col items-start space-y-2">
+                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
+                      <%= case episode.status
+                          when 'published'
+                            'bg-green-100 text-green-800'
+                          when 'preview'
+                            'bg-blue-100 text-blue-800'
+                          when 'draft'
+                            'bg-yellow-100 text-yellow-800'
+                          when 'hidden'
+                            'bg-red-100 text-red-800'
+                          else
+                            'bg-gray-100 text-gray-800'
+                          end %>">
+                      <%= episode.status.humanize %>
+                    </span>
+                    <% if episode.preview? && episode.preview_token.present? %>
+                      <button type="button" 
+                              class="text-blue-600 hover:text-blue-800 text-xs flex items-center"
+                              data-controller="preview-token"
+                              data-action="click->preview-token#copyToken"
+                              data-preview-token-value="<%= episode.preview_token %>"
+                              title="Copy preview URL">
+                        <i class="fas fa-copy mr-1"></i>
+                        Copy URL
+                      </button>
+                    <% end %>
+                  </div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                   <% if episode.duration.present? %>
@@ -73,18 +88,35 @@
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                   <div class="flex space-x-2">
-                    <%= link_to "View", episode_path(episode), 
-                        class: "text-blue-600 hover:text-blue-900" %>
-                    <span class="text-gray-300">|</span>
-                    <%= link_to "Edit", edit_admin_episode_path(episode), 
-                        class: "text-green-600 hover:text-green-900" %>
-                    <span class="text-gray-300">|</span>
-                    <%= link_to "Delete", admin_episode_path(episode), 
+                    <% if episode.published? %>
+                      <%= link_to episode_path(episode), 
+                          class: "admin-button admin-button-primary" do %>
+                        <i class="fas fa-eye mr-1.5"></i>
+                        View
+                      <% end %>
+                    <% elsif episode.preview? %>
+                      <%= link_to episode_path(episode.preview_token), 
+                          class: "admin-button admin-button-primary" do %>
+                        <i class="fas fa-eye mr-1.5"></i>
+                        Preview
+                      <% end %>
+                    <% end %>
+                    
+                    <%= link_to edit_admin_episode_path(episode), 
+                        class: "admin-button admin-button-success" do %>
+                      <i class="fas fa-edit mr-1.5"></i>
+                      Edit
+                    <% end %>
+                    
+                    <%= link_to admin_episode_path(episode), 
                         data: { 
                           turbo_method: :delete,
                           controller: "delete-confirmation"
                         },
-                        class: "text-red-600 hover:text-red-900" %>
+                        class: "admin-button admin-button-danger" do %>
+                      <i class="fas fa-trash mr-1.5"></i>
+                      Delete
+                    <% end %>
                   </div>
                 </td>
               </tr>

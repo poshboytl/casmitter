@@ -20,11 +20,12 @@ class EpisodesController < ApplicationController
     @guests = @episode.guests
   end
 
-
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_episode
-      @episode = Episode.find_by(slug: params.expect(:id)) || Episode.find_by(number: params.expect(:id))
+      @episode = Episode.published.find_by(slug: params.expect(:id)) || 
+                 Episode.published.find_by(number: params.expect(:id)) ||
+                 Episode.preview.find_by(preview_token: params.expect(:id))
       raise ActionController::RoutingError.new('Not Found') unless @episode
     end
 

@@ -20,10 +20,10 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body class="bg-gray-50">
-    <!-- Header -->
-    <header class="bg-white shadow-sm border-b border-gray-200">
-      <div class="flex items-center justify-between px-6 py-4">
+  <body class="bg-gray-50 h-screen overflow-hidden">
+    <!-- Header - Fixed height -->
+    <header class="bg-white shadow-sm border-b border-gray-200 h-16 flex-shrink-0">
+      <div class="flex items-center justify-between px-6 py-4 h-full">
         <div class="flex items-center space-x-4">
           <img alt="Casmitter logo" class="h-10 w-10 rounded-full" src="<%= asset_path("teahour2-logo.jpg")%>"/>
           <h1 class="text-xl font-semibold text-gray-900">Admin Dashboard</h1>
@@ -39,11 +39,14 @@
       </div>
     </header>
 
-    <div class="flex h-screen bg-gray-50">
-      <!-- Sidebar -->
-      <%= render 'shared/admin_sidebar' %>
+    <!-- Main Container - Calculate remaining height -->
+    <div class="flex h-[calc(100vh-4rem)] bg-gray-50">
+      <!-- Sidebar - Fixed width, no scroll -->
+      <aside class="w-64 bg-white shadow-sm border-r border-gray-200 flex-shrink-0">
+        <%= render 'shared/admin_sidebar' %>
+      </aside>
 
-      <!-- Main Content -->
+      <!-- Main Content - Scrollable -->
       <main class="flex-1 overflow-auto">
         <div class="p-6">
           <% if notice %>

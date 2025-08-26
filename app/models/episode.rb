@@ -1,9 +1,10 @@
 class Episode < ApplicationRecord
-  enum :status,  draft: 0, published: 1, hidden: 2
+  enum :status,  draft: 0, preview: 1, published: 2, hidden: 3
 
   validates :name, presence: true
   validates :number, numericality: { only_integer: true, greater_than: 0 }, allow_nil: true
   validates :slug, presence: true, uniqueness: true, format: { with: /\A[a-z0-9-]+\z/, message: "can only contain lowercase letters, numbers, and hyphens" }
+  validates :preview_token, uniqueness: true, allow_nil: true
 
   has_many :attendances
   has_many :attendees, through: :attendances
@@ -11,6 +12,7 @@ class Episode < ApplicationRecord
   has_many :guests, -> { where(attendances: { role: 'guest' }) }, through: :attendances, source: :attendee
 
   before_save :auto_assign_published_fields, if: :status_changed_to_published?
+  before_create :generate_preview_token
 
   scope :published, -> { where(status: :published) }
 
@@ -53,6 +55,13 @@ class Episode < ApplicationRecord
 
   def status_changed_to_published?
     status_changed? && published? && !status_was.to_s.inquiry.published?
+  end
+
+  def generate_preview_token
+    loop do
+      self.preview_token = SecureRandom.uuid
+      break unless Episode.exists?(preview_token: preview_token)
+    end
   end
 
   def auto_assign_published_fields
