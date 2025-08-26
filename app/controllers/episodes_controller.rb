@@ -3,7 +3,7 @@ class EpisodesController < ApplicationController
 
   # GET /episodes or /episodes.json
   def index
-    @episodes = Episode.all.order(created_at: :desc)
+    @episodes = Episode.published.order(number: :desc)
     @hosts = Host.all
 
     respond_to do |format|
