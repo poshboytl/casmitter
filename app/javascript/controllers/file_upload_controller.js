@@ -58,7 +58,6 @@ export default class extends Controller {
     this.dropZoneTarget.addEventListener('dragover', this.handleDragOver.bind(this))
     this.dropZoneTarget.addEventListener('dragleave', this.handleDragLeave.bind(this))
     this.dropZoneTarget.addEventListener('drop', this.handleDrop.bind(this))
-    this.dropZoneTarget.addEventListener('click', this.handleClick.bind(this))
     
     // Add change event listener for file input
     if (this.hasFileInputTarget) {
@@ -75,7 +74,6 @@ export default class extends Controller {
     this.dropZoneTarget.removeEventListener('dragover', this.handleDragOver.bind(this))
     this.dropZoneTarget.removeEventListener('dragleave', this.handleDragLeave.bind(this))
     this.dropZoneTarget.removeEventListener('drop', this.handleDrop.bind(this))
-    this.dropZoneTarget.removeEventListener('click', this.handleClick.bind(this))
     
     // Remove change event listener for file input
     if (this.hasFileInputTarget) {
@@ -114,14 +112,7 @@ export default class extends Controller {
     }
   }
 
-  handleClick(event) {
-    // Don't trigger file input if clicking on specific elements
-    if (event.target.closest('button') || event.target.closest('input')) {
-      return
-    }
-    
-    this.fileInputTarget.click()
-  }
+
 
   handleFileInput(event) {
     const file = event.target.files[0]
