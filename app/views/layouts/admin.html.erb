@@ -11,12 +11,17 @@
     <%= yield :head %>
 
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+    <link href="https://unpkg.com/easymde@2.15.0/dist/easymde.min.css" rel="stylesheet"/>
     <link rel="icon" href="<%= asset_path('favicon.ico') %>" type="image/x-icon">
     <link rel="icon" href="/icon.png" type="image/png">
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.png">
 
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    
+    <%# Load EasyMDE globally before Stimulus controllers %>
+    <script src="https://unpkg.com/easymde@2.15.0/dist/easymde.min.js" onload="console.log('EasyMDE loaded:', typeof EasyMDE, window.EasyMDE)" onerror="console.error('EasyMDE failed to load')"></script>
+    
     <%= javascript_importmap_tags %>
   </head>
 
