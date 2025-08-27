@@ -49,6 +49,11 @@ class Admin::EpisodesController < Admin::BaseController
   private
 
   def episode_params
-    params.require(:episode).permit(:name, :summary, :desc, :keywords, :number, :slug, :duration, :cover_url, :status, :file_uri, :length, :published_at)
+    params.require(:episode).permit(
+      :name, :summary, :desc, :keywords, 
+      :number, :slug, :duration, :cover_url, 
+      :status, :file_uri, :length, :published_at,
+      guest_ids: [], host_ids: []
+    )
   end
 end

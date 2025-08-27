@@ -51,6 +51,24 @@ class Episode < ApplicationRecord
     maximum_number + 1
   end
 
+  def guest_ids=(ids)
+    if ids.blank?
+      self.guests = []
+    else
+      guests = Attendee.where(id: ids)
+      self.guests = guests
+    end
+  end
+  
+  def host_ids=(ids)
+    if ids.blank?
+      self.hosts = []
+    else
+      hosts = Attendee.where(id: ids)
+      self.hosts = hosts
+    end
+  end
+
   private
 
   def status_changed_to_published?
