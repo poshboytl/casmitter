@@ -1,0 +1,221 @@
+<div class="max-w-4xl mx-auto">
+  <!-- Page Header -->
+  <div class="mb-8">
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-900"><%= @attendee.name %></h1>
+        <p class="mt-2 text-gray-600">
+          <span class="inline-flex px-2 py-1 text-sm font-semibold rounded-full 
+            <%= case @attendee.type
+                when 'Host'
+                  'bg-blue-100 text-blue-800'
+                when 'Guest'
+                  'bg-green-100 text-green-800'
+                else
+                  'bg-gray-100 text-gray-800'
+                end %>">
+            <%= @attendee.type || 'Attendee' %>
+          </span>
+          <span class="ml-2 text-gray-500">
+            Added <%= @attendee.created_at.strftime("%B %d, %Y") %>
+          </span>
+        </p>
+      </div>
+      <div class="flex space-x-3">
+        <%= link_to admin_attendees_path, class: "text-gray-500 hover:text-gray-700" do %>
+          <i class="fas fa-arrow-left mr-2"></i>Back to Attendees
+        <% end %>
+        <%= link_to edit_admin_attendee_path(@attendee), class: "admin-button admin-button-success" do %>
+          <i class="fas fa-edit mr-1.5"></i>Edit
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <!-- Main Content -->
+    <div class="lg:col-span-2 space-y-8">
+      <!-- Basic Information -->
+      <div class="bg-white shadow rounded-lg">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <h3 class="text-lg font-medium text-gray-900">Basic Information</h3>
+        </div>
+        <div class="p-6">
+          <div class="flex items-start space-x-6">
+            <div class="flex-shrink-0">
+              <% if @attendee.avatar_url.present? %>
+                <img class="h-24 w-24 rounded-full object-cover" src="<%= @attendee.avatar_url %>" alt="<%= @attendee.name %>">
+              <% else %>
+                <div class="h-24 w-24 rounded-full bg-gray-300 flex items-center justify-center">
+                  <i class="fas fa-user text-3xl text-gray-500"></i>
+                </div>
+              <% end %>
+            </div>
+            <div class="flex-1">
+              <dl class="space-y-4">
+                <div>
+                  <dt class="text-sm font-medium text-gray-500">Name</dt>
+                  <dd class="mt-1 text-sm text-gray-900"><%= @attendee.name %></dd>
+                </div>
+                <% if @attendee.bio.present? %>
+                  <div>
+                    <dt class="text-sm font-medium text-gray-500">Bio</dt>
+                    <dd class="mt-1 text-sm text-gray-900"><%= @attendee.bio %></dd>
+                  </div>
+                <% end %>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Detailed Description -->
+      <% if @attendee.desc.present? %>
+        <div class="bg-white shadow rounded-lg">
+          <div class="px-6 py-4 border-b border-gray-200">
+            <h3 class="text-lg font-medium text-gray-900">Description</h3>
+          </div>
+          <div class="p-6">
+            <div class="prose max-w-none">
+              <%= simple_format(@attendee.desc) %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+
+      <!-- Episodes -->
+      <div class="bg-white shadow rounded-lg">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <h3 class="text-lg font-medium text-gray-900">
+            Episodes 
+            <span class="text-sm font-normal text-gray-500">(<%= @attendee.episodes.count %>)</span>
+          </h3>
+        </div>
+        <div class="p-6">
+          <% if @attendee.episodes.any? %>
+            <div class="space-y-4">
+              <% @attendee.episodes.order(created_at: :desc).limit(5).each do |episode| %>
+                <div class="flex items-center justify-between py-3 border-b border-gray-100 last:border-b-0">
+                  <div class="flex items-center space-x-4">
+                    <div class="flex-shrink-0">
+                      <img class="h-12 w-12 rounded-lg object-cover" src="<%= episode.cover_image_url %>" alt="Episode cover">
+                    </div>
+                    <div>
+                      <h4 class="text-sm font-medium text-gray-900"><%= episode.name %></h4>
+                      <p class="text-sm text-gray-500">Episode #<%= episode.number %></p>
+                    </div>
+                  </div>
+                  <div class="flex items-center space-x-2">
+                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
+                      <%= case episode.status
+                          when 'published'
+                            'bg-green-100 text-green-800'
+                          when 'preview'
+                            'bg-blue-100 text-blue-800'
+                          when 'draft'
+                            'bg-yellow-100 text-yellow-800'
+                          when 'hidden'
+                            'bg-red-100 text-red-800'
+                          else
+                            'bg-gray-100 text-gray-800'
+                          end %>">
+                      <%= episode.status.humanize %>
+                    </span>
+                    <%= link_to edit_admin_episode_path(episode), class: "text-blue-600 hover:text-blue-800 text-sm" do %>
+                      <i class="fas fa-edit"></i>
+                    <% end %>
+                  </div>
+                </div>
+              <% end %>
+              <% if @attendee.episodes.count > 5 %>
+                <div class="text-center pt-4">
+                  <p class="text-sm text-gray-500">And <%= @attendee.episodes.count - 5 %> more episodes...</p>
+                </div>
+              <% end %>
+            </div>
+          <% else %>
+            <div class="text-center py-8">
+              <i class="fas fa-podcast text-2xl text-gray-400 mb-2"></i>
+              <p class="text-gray-500">No episodes yet</p>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="space-y-6">
+      <!-- Social Links -->
+      <% if @attendee.social_links_present? %>
+        <div class="bg-white shadow rounded-lg">
+          <div class="px-6 py-4 border-b border-gray-200">
+            <h3 class="text-lg font-medium text-gray-900">Social Links</h3>
+          </div>
+          <div class="p-6 space-y-3">
+            <% @attendee.social_links&.each do |platform, url| %>
+              <% next if url.blank? %>
+              <div class="flex items-center space-x-3">
+                <%= render 'social_link_icon', platform: platform %>
+                <div class="flex flex-col">
+                  <span class="text-xs text-gray-500 uppercase tracking-wide"><%= platform %></span>
+                  <a href="<%= url %>" 
+                     target="_blank" 
+                     class="text-blue-600 hover:text-blue-800 text-sm break-all">
+                    <%= url %>
+                  </a>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+
+      <!-- Statistics -->
+      <div class="bg-white shadow rounded-lg">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <h3 class="text-lg font-medium text-gray-900">Statistics</h3>
+        </div>
+        <div class="p-6 space-y-4">
+          <div class="flex justify-between">
+            <span class="text-sm text-gray-500">Total Episodes</span>
+            <span class="text-sm font-medium text-gray-900"><%= @attendee.episodes.count %></span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-sm text-gray-500">Published Episodes</span>
+            <span class="text-sm font-medium text-gray-900"><%= @attendee.episodes.published.count %></span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-sm text-gray-500">As Host</span>
+            <span class="text-sm font-medium text-gray-900"><%= @attendee.attendances.host.count %></span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-sm text-gray-500">As Guest</span>
+            <span class="text-sm font-medium text-gray-900"><%= @attendee.attendances.guest.count %></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="bg-white shadow rounded-lg">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <h3 class="text-lg font-medium text-gray-900">Actions</h3>
+        </div>
+        <div class="p-6 space-y-3">
+          <%= link_to edit_admin_attendee_path(@attendee), 
+              class: "w-full admin-button admin-button-success" do %>
+            <i class="fas fa-edit mr-1.5"></i>Edit Attendee
+          <% end %>
+          
+          <%= link_to admin_attendee_path(@attendee), 
+              data: { 
+                turbo_method: :delete,
+                controller: "delete-confirmation"
+              },
+              class: "w-full admin-button admin-button-danger" do %>
+            <i class="fas fa-trash mr-1.5"></i>Delete Attendee
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

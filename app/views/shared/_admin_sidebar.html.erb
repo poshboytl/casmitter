@@ -1,14 +1,25 @@
 <!-- Sidebar Navigation -->
 <nav class="mt-8">          
     <div class="mt-4">
-      <%= link_to admin_dashboard_path, class: "flex items-center px-4 py-3 text-sm font-medium #{current_page?(admin_dashboard_path) ? 'text-blue-600 bg-blue-50 border-blue-500' : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900 border-transparent hover:border-blue-500'} border-r-2 transition-colors duration-200" do %>
-        <i class="fas fa-tachometer-alt w-5 h-5 mr-3"></i>
+      <%= link_to admin_dashboard_path, class: "flex items-center px-4 py-4 text-base font-medium #{current_page?(admin_dashboard_path) ? 'text-blue-600 bg-blue-50 border-blue-500' : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900 border-transparent hover:border-blue-500'} border-r-2 transition-colors duration-200" do %>
+        <span class="inline-flex items-center justify-center w-6 h-6 mr-4">
+          <i class="fas fa-tachometer-alt text-base"></i>
+        </span>
         Dashboard
       <% end %>
       
-      <%= link_to admin_episodes_path, class: "flex items-center px-4 py-3 text-sm font-medium #{current_page?(admin_episodes_path) ? 'text-blue-600 bg-blue-50 border-blue-500' : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900 border-transparent hover:border-blue-500'} border-r-2 transition-colors duration-200" do %>
-        <i class="fas fa-podcast w-5 h-5 mr-3"></i>
+      <%= link_to admin_episodes_path, class: "flex items-center px-4 py-4 text-base font-medium #{current_page?(admin_episodes_path) ? 'text-blue-600 bg-blue-50 border-blue-500' : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900 border-transparent hover:border-blue-500'} border-r-2 transition-colors duration-200" do %>
+        <span class="inline-flex items-center justify-center w-6 h-6 mr-4">
+          <i class="fas fa-podcast text-base"></i>
+        </span>
         Episodes
+      <% end %>
+      
+      <%= link_to admin_attendees_path, class: "flex items-center px-4 py-4 text-base font-medium #{current_page?(admin_attendees_path) || params[:controller] == 'admin/attendees' ? 'text-blue-600 bg-blue-50 border-blue-500' : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900 border-transparent hover:border-blue-500'} border-r-2 transition-colors duration-200" do %>
+        <span class="inline-flex items-center justify-center w-6 h-6 mr-4">
+          <i class="fas fa-users text-base"></i>
+        </span>
+        Attendees
       <% end %>
     </div>
   </nav>

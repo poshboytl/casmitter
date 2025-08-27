@@ -32,6 +32,7 @@ Rails.application.routes.draw do
     get 'dashboard', to: 'dashboard#index'
     root to: 'dashboard#index'
     resources :episodes, only: [:index, :new, :create, :edit, :update, :destroy]
+    resources :attendees, only: [:index, :show, :new, :create, :edit, :update, :destroy]
   end
 
   # Presigned URLs API - only for uploading
