@@ -27,6 +27,9 @@ gem "solid_cable"
 # Authentication & Security
 gem "bcrypt", "~> 3.1.7"
 
+# Environment Variables
+gem "dotenv-rails"
+
 # File Upload & Processing
 # gem "shrine", "~> 3.6"
 gem "aws-sdk-s3", "~> 1.14"

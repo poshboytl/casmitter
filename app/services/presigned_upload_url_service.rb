@@ -8,7 +8,7 @@ class PresignedUploadUrlService
     @storage = Rails.application.config.active_storage.service
     begin
       @s3_client = create_s3_client
-      @bucket = Rails.application.credentials.dig(:s3, :bucket)
+      @bucket = ENV['S3_BUCKET']
     rescue => e
       Rails.logger.error "Failed to initialize PresignedUploadUrlService: #{e.message}"
       Rails.logger.error "Backtrace: #{e.backtrace.join("\n")}"
@@ -36,11 +36,11 @@ class PresignedUploadUrlService
       policy_base64 = Base64.strict_encode64(policy_document)
       signature = Base64.strict_encode64(
         OpenSSL::HMAC.digest('sha1', 
-          Rails.application.credentials.dig(:s3, :secret_access_key), 
+          ENV['S3_SECRET_ACCESS_KEY'], 
           policy_base64)
       )
 
-      upload_url = Rails.application.credentials.dig(:s3, :endpoint) + "/#{@bucket}"
+      upload_url = ENV['S3_ENDPOINT'] + "/#{@bucket}"
       
       {
         success: true,
@@ -50,7 +50,7 @@ class PresignedUploadUrlService
           key: key,
           'Content-Type' => content_type,
           acl: 'public-read',  # Add ACL field to set file as public
-          AWSAccessKeyId: Rails.application.credentials.dig(:s3, :access_key_id),
+          AWSAccessKeyId: ENV['S3_ACCESS_KEY_ID'],
           policy: policy_base64,
           signature: signature
         },
@@ -68,13 +68,13 @@ class PresignedUploadUrlService
   def create_s3_client    
     # Create explicit credentials object to avoid autoload issues
     credentials = Aws::Credentials.new(
-      Rails.application.credentials.dig(:s3, :access_key_id),
-      Rails.application.credentials.dig(:s3, :secret_access_key)
+      ENV['S3_ACCESS_KEY_ID'],
+      ENV['S3_SECRET_ACCESS_KEY']
     )
     
     Aws::S3::Client.new(
-      region: Rails.application.credentials.dig(:s3, :region),
-      endpoint: Rails.application.credentials.dig(:s3, :endpoint),
+      region: ENV['S3_REGION'],
+      endpoint: ENV['S3_ENDPOINT'],
       credentials: credentials,
       force_path_style: false
     )
