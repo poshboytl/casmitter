@@ -49,12 +49,15 @@ class Admin::AttendeesController < Admin::BaseController
   end
 
   def attendee_params
-    # Determine the correct parameter key based on the attendee type
-    param_key = @attendee&.class&.name&.downcase || 
-                params[:attendee]&.dig(:type)&.downcase || 
-                params[:guest] ? 'guest' : 
-                params[:host] ? 'host' : 
-                'attendee'
+    # Always use 'attendee' key if it's present in params, otherwise fall back to type-based logic
+    param_key = if params[:attendee].present?
+                  'attendee'
+                else
+                  @attendee&.class&.name&.downcase || 
+                  params[:guest] ? 'guest' : 
+                  params[:host] ? 'host' : 
+                  'attendee'
+                end
     
     Rails.logger.info("Using param key: #{param_key}")
     Rails.logger.info("Available params keys: #{params.keys}")
