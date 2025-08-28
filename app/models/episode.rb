@@ -1,5 +1,5 @@
 class Episode < ApplicationRecord
-  enum :status,  draft: 0, preview: 1, published: 2, hidden: 3
+  enum :status,  draft: 0, published: 1, hidden: 2, preview: 3
 
   validates :name, presence: true
   validates :number, numericality: { only_integer: true, greater_than: 0 }, allow_nil: true
