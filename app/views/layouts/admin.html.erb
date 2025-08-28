@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= content_for(:title) || "Admin Dashboard - Casmitter" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= yield :head %>
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+    <link href="https://unpkg.com/easymde@2.15.0/dist/easymde.min.css" rel="stylesheet"/>
+    <link rel="icon" href="<%= asset_path('favicon.ico') %>" type="image/x-icon">
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icon.png">
+
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    
+    <%# Load EasyMDE globally before Stimulus controllers %>
+    <script src="https://unpkg.com/easymde@2.15.0/dist/easymde.min.js" onload="console.log('EasyMDE loaded:', typeof EasyMDE, window.EasyMDE)" onerror="console.error('EasyMDE failed to load')"></script>
+    
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body class="bg-gray-50 h-screen overflow-hidden">
+    <!-- Header - Fixed height -->
+    <header class="bg-white shadow-sm border-b border-gray-200 h-16 flex-shrink-0">
+      <div class="flex items-center justify-between px-6 py-4 h-full">
+        <div class="flex items-center space-x-4">
+          <img alt="Casmitter logo" class="h-10 w-10 rounded-full" src="<%= asset_path("teahour2-logo.jpg")%>"/>
+          <h1 class="text-xl font-semibold text-gray-900">Admin Dashboard</h1>
+        </div>
+        
+        <div class="flex items-center space-x-4">
+          <span class="text-sm text-gray-600">
+            Welcome, <%= Current.user&.email_address || Current.user&.email_address || "Admin" %>
+          </span>
+          <%= link_to "Logout", session_path, method: :delete, 
+              class: "admin-button admin-button-danger" %>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Container - Calculate remaining height -->
+    <div class="flex h-[calc(100vh-4rem)] bg-gray-50">
+      <!-- Sidebar - Fixed width, no scroll -->
+      <aside class="w-64 bg-white shadow-sm border-r border-gray-200 flex-shrink-0">
+        <%= render 'shared/admin_sidebar' %>
+      </aside>
+
+      <!-- Main Content - Scrollable -->
+      <main class="flex-1 overflow-auto">
+        <div class="p-6">
+          <% if notice %>
+            <div class="mb-4 bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-md">
+              <%= notice %>
+            </div>
+          <% end %>
+          
+          <% if alert %>
+            <div class="mb-4 bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-md">
+              <%= alert %>
+            </div>
+          <% end %>
+          
+          <%= yield %>
+        </div>
+      </main>
+    </div>
+  </body>
+</html>

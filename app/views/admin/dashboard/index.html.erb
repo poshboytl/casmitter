@@ -1,0 +1,119 @@
+<div class="max-w-7xl mx-auto">
+  <!-- Page Header -->
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-gray-900">Dashboard</h1>
+    <p class="mt-2 text-gray-600">Welcome to your admin dashboard. Here you can manage your podcast content.</p>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div class="bg-white overflow-hidden shadow rounded-lg">
+      <div class="p-5">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <i class="fas fa-podcast text-3xl text-blue-600"></i>
+          </div>
+          <div class="ml-5 w-0 flex-1">
+            <dl>
+              <dt class="text-sm font-medium text-gray-500 truncate">Total Episodes</dt>
+              <dd class="text-lg font-medium text-gray-900">
+                <%= Episode.count %>
+              </dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white overflow-hidden shadow rounded-lg">
+      <div class="p-5">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <i class="fas fa-users text-3xl text-green-600"></i>
+          </div>
+          <div class="ml-5 w-0 flex-1">
+            <dl>
+              <dt class="text-sm font-medium text-gray-500 truncate">Total Attendees</dt>
+              <dd class="text-lg font-medium text-gray-900">
+                <%= Attendee.count %>
+              </dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white overflow-hidden shadow rounded-lg">
+      <div class="p-5">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <i class="fas fa-calendar text-3xl text-purple-600"></i>
+          </div>
+          <div class="ml-5 w-0 flex-1">
+            <dl>
+              <dt class="text-sm font-medium text-gray-500 truncate">Published Episodes</dt>
+              <dd class="text-lg font-medium text-gray-900">
+                <%= Episode.published.count %>
+              </dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white overflow-hidden shadow rounded-lg">
+      <div class="p-5">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <i class="fas fa-calendar text-3xl text-orange-600"></i>
+          </div>
+          <div class="ml-5 w-0 flex-1">
+            <dl>
+              <dt class="text-sm font-medium text-gray-500 truncate">This Month</dt>
+              <dd class="text-lg font-medium text-gray-900">
+                <%= Episode.where('created_at >= ?', 1.month.ago).count %>
+              </dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="bg-white shadow rounded-lg">
+    <div class="px-6 py-4 border-b border-gray-200">
+      <h3 class="text-lg font-medium text-gray-900">Quick Actions</h3>
+    </div>
+    <div class="p-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <%= link_to new_admin_episode_path, 
+            class: "flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200" do %>
+          <i class="fas fa-plus text-blue-600 mr-3"></i>
+          <div>
+            <h4 class="font-medium text-gray-900">Add New Episode</h4>
+            <p class="text-sm text-gray-500">Create a new podcast episode</p>
+          </div>
+        <% end %>
+        
+        <%= link_to admin_attendees_path, 
+            class: "flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200" do %>
+          <i class="fas fa-user-plus text-green-600 mr-3"></i>
+          <div>
+            <h4 class="font-medium text-gray-900">Manage Attendees</h4>
+            <p class="text-sm text-gray-500">Add or edit podcast hosts and guests</p>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Activity -->
+  <div class="mt-8 bg-white shadow rounded-lg">
+    <div class="px-6 py-4 border-b border-gray-200">
+      <h3 class="text-lg font-medium text-gray-900">Recent Episodes</h3>
+    </div>
+    <div class="p-6">
+    </div>
+  </div>
+</div>

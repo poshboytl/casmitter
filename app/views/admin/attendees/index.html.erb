@@ -1,0 +1,274 @@
+<div class="max-w-7xl mx-auto">
+  <!-- Page Header -->
+  <div class="mb-8 flex justify-between items-center">
+    <div>
+      <h1 class="text-3xl font-bold text-gray-900">Attendees</h1>
+      <p class="mt-2 text-gray-600">Manage podcast hosts and guests</p>
+    </div>
+    <%= link_to new_admin_attendee_path, class: "admin-button admin-button-primary" do %>
+      <i class="fas fa-plus mr-1.5"></i>New Attendee
+    <% end %>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div class="bg-white overflow-hidden shadow rounded-lg">
+      <div class="p-5">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <i class="fas fa-users text-3xl text-blue-600"></i>
+          </div>
+          <div class="ml-5 w-0 flex-1">
+            <dl>
+              <dt class="text-sm font-medium text-gray-500 truncate">Total Attendees</dt>
+              <dd class="text-lg font-medium text-gray-900">
+                <%= Attendee.count %>
+              </dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white overflow-hidden shadow rounded-lg">
+      <div class="p-5">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <i class="fas fa-microphone text-3xl text-green-600"></i>
+          </div>
+          <div class="ml-5 w-0 flex-1">
+            <dl>
+              <dt class="text-sm font-medium text-gray-500 truncate">Hosts</dt>
+              <dd class="text-lg font-medium text-gray-900">
+                <%= Host.count %>
+              </dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white overflow-hidden shadow rounded-lg">
+      <div class="p-5">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <i class="fas fa-user-friends text-3xl text-purple-600"></i>
+          </div>
+          <div class="ml-5 w-0 flex-1">
+            <dl>
+              <dt class="text-sm font-medium text-gray-500 truncate">Guests</dt>
+              <dd class="text-lg font-medium text-gray-900">
+                <%= Guest.count %>
+              </dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hosts Table -->
+  <div class="bg-white shadow rounded-lg mb-8">
+    <div class="px-6 py-4 border-b border-gray-200">
+      <div class="flex items-center justify-between">
+        <h3 class="text-lg font-medium text-gray-900">
+          <i class="fas fa-microphone text-blue-600 mr-2"></i>
+          Hosts
+        </h3>
+        <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm font-medium">
+          <%= @hosts.count %>
+        </span>
+      </div>
+    </div>
+    
+    <% if @hosts.any? %>
+      <div class="overflow-hidden">
+        <table class="min-w-full divide-y divide-gray-200 table-fixed">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-2/5">Name</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-16">Episodes</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">Created</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <% @hosts.each do |host| %>
+              <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <div class="flex-shrink-0 h-10 w-10">
+                      <% if host.avatar_url.present? %>
+                        <img class="h-10 w-10 rounded-full object-cover" src="<%= host.avatar_url %>" alt="<%= host.name %>">
+                      <% else %>
+                        <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+                          <i class="fas fa-microphone text-blue-600"></i>
+                        </div>
+                      <% end %>
+                    </div>
+                    <div class="ml-4">
+                      <div class="text-sm font-medium text-gray-900"><%= host.name %></div>
+                      <div class="text-sm text-gray-500 truncate max-w-xs"><%= host.bio %></div>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <%= host.episodes.count %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <%= host.created_at.strftime("%b %d, %Y") %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                  <div class="flex space-x-2">
+                    <%= link_to admin_attendee_path(host), 
+                        class: "admin-button admin-button-primary" do %>
+                      <i class="fas fa-eye mr-1.5"></i>
+                      View
+                    <% end %>
+                    
+                    <%= link_to edit_admin_attendee_path(host), 
+                        class: "admin-button admin-button-success" do %>
+                      <i class="fas fa-edit mr-1.5"></i>
+                      Edit
+                    <% end %>
+                    
+                    <%= link_to admin_attendee_path(host), 
+                        data: { 
+                          turbo_method: :delete,
+                          controller: "delete-confirmation"
+                        },
+                        class: "admin-button admin-button-danger" do %>
+                      <i class="fas fa-trash mr-1.5"></i>
+                      Delete
+                    <% end %>
+                  </div>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% else %>
+      <div class="text-center py-12">
+        <i class="fas fa-microphone text-4xl text-blue-400 mb-4"></i>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">No hosts yet</h3>
+        <p class="text-gray-500">Add your first podcast host to get started.</p>
+        <%= link_to new_admin_attendee_path(type: 'Host'), class: "mt-4 admin-button admin-button-primary" do %>
+          <i class="fas fa-plus mr-1.5"></i>Add Host
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Guests Table -->
+  <div class="bg-white shadow rounded-lg">
+    <div class="px-6 py-4 border-b border-gray-200">
+      <div class="flex items-center justify-between">
+        <h3 class="text-lg font-medium text-gray-900">
+          <i class="fas fa-user-friends text-green-600 mr-2"></i>
+          Guests
+        </h3>
+        <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-sm font-medium">
+          <%= @guests.count %>
+        </span>
+      </div>
+    </div>
+    
+    <% if @guests.any? %>
+      <div class="overflow-hidden">
+        <table class="min-w-full divide-y divide-gray-200 table-fixed">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-2/5">Name</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-16">Episodes</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">Created</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <% @guests.each do |guest| %>
+              <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <div class="flex-shrink-0 h-10 w-10">
+                      <% if guest.avatar_url.present? %>
+                        <img class="h-10 w-10 rounded-full object-cover" src="<%= guest.avatar_url %>" alt="<%= guest.name %>">
+                      <% else %>
+                        <div class="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
+                          <i class="fas fa-user-friends text-green-600"></i>
+                        </div>
+                      <% end %>
+                    </div>
+                    <div class="ml-4">
+                      <div class="text-sm font-medium text-gray-900"><%= guest.name %></div>
+                      <div class="text-sm text-gray-500 truncate max-w-xs"><%= guest.bio %></div>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <%= guest.episodes.count %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <%= guest.created_at.strftime("%b %d, %Y") %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                  <div class="flex space-x-2">
+                    <%= link_to admin_attendee_path(guest), 
+                        class: "admin-button admin-button-primary" do %>
+                      <i class="fas fa-eye mr-1.5"></i>
+                      View
+                    <% end %>
+                    
+                    <%= link_to edit_admin_attendee_path(guest), 
+                        class: "admin-button admin-button-success" do %>
+                      <i class="fas fa-edit mr-1.5"></i>
+                      Edit
+                    <% end %>
+                    
+                    <%= link_to admin_attendee_path(guest), 
+                        data: { 
+                          turbo_method: :delete,
+                          controller: "delete-confirmation"
+                        },
+                        class: "admin-button admin-button-danger" do %>
+                      <i class="fas fa-trash mr-1.5"></i>
+                      Delete
+                    <% end %>
+                  </div>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% else %>
+      <div class="text-center py-12">
+        <i class="fas fa-user-friends text-4xl text-green-400 mb-4"></i>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">No guests yet</h3>
+        <p class="text-gray-500">Add your first podcast guest to get started.</p>
+        <%= link_to new_admin_attendee_path(type: 'Guest'), class: "mt-4 admin-button admin-button-primary" do %>
+          <i class="fas fa-plus mr-1.5"></i>Add Guest
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Overall No Attendees Message -->
+  <% if !@hosts.any? && !@guests.any? %>
+    <div class="bg-white shadow rounded-lg">
+      <div class="text-center py-16">
+        <i class="fas fa-users text-6xl text-gray-400 mb-6"></i>
+        <h3 class="text-xl font-medium text-gray-900 mb-3">No attendees yet</h3>
+        <p class="text-gray-500 mb-6">Get started by adding your first podcast host or guest.</p>
+        <div class="flex justify-center space-x-4">
+          <%= link_to new_admin_attendee_path(type: 'Host'), class: "admin-button admin-button-primary" do %>
+            <i class="fas fa-microphone mr-1.5"></i>Add Host
+          <% end %>
+          <%= link_to new_admin_attendee_path(type: 'Guest'), class: "admin-button admin-button-success" do %>
+            <i class="fas fa-user-friends mr-1.5"></i>Add Guest
+          <% end %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>

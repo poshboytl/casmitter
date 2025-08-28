@@ -2,9 +2,10 @@ Rails.application.routes.draw do
   # a workaround for redirecting a wrong episode link to the correct one
   get 'episodes/167', to: redirect('/episodes/1')
   
-  # resource :session
+  resource :session, only: [:new, :create, :destroy]
   # resources :passwords, param: :token
   resources :episodes, only: [:show, :index]
+  get 'preview/:token', to: 'episodes#show', as: :preview_episode
   resources :hosts, only: [:show]
   resources :guests, only: [:show]
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
@@ -25,4 +26,17 @@ Rails.application.routes.draw do
   get 'feed' => 'episodes#index', :defaults => { :format => 'rss' }
   get 'rss'  => 'episodes#index', :defaults => { :format => 'rss' }
 
+  get 'login', to: 'sessions#new'
+
+  namespace :admin do
+    get 'dashboard', to: 'dashboard#index'
+    root to: 'dashboard#index'
+    resources :episodes, only: [:index, :new, :create, :edit, :update, :destroy]
+    resources :attendees, only: [:index, :show, :new, :create, :edit, :update, :destroy]
+  end
+
+  # Presigned URLs API - only for uploading
+  namespace :api do
+    resources :presigned_urls, only: [:create]
+  end
 end

@@ -6,8 +6,8 @@ class AttendeeTest < ActiveSupport::TestCase
   # end
 
   def setup
-    @host = Host.new
-    @guest = Guest.new
+    @host = attendees(:jason)
+    @guest = attendees(:kevin)
   end
 
   test "create Host" do
@@ -18,11 +18,20 @@ class AttendeeTest < ActiveSupport::TestCase
     assert_equal 'Guest', @guest.class.name
   end
 
-  test "social links" do
-    attendee = Attendee.new
-    attendee.social_links = { weibo: "https://weibo.com/u/1234567890", twitter: "https://twitter.com/username" }
-    attendee.save
-    assert_equal "https://weibo.com/u/1234567890", attendee.social_links[:weibo]
+  test "social links with correct structure" do
+    @host.social_links = { weibo: "https://weibo.com/u/1234567890", twitter: "https://twitter.com/username" }
+    assert_equal true, @host.valid?
   end
 
+  test "social links with incorrect structure" do
+    @host.social_links = { weibo: "https://weibo.com/u/1234567890", twitter: "invalid_url" }
+    assert_equal false, @host.valid?
+    assert_equal "must be a valid URL for twitter", @host.errors[:social_links].first
+  end
+
+  test "social links url is digits" do
+    @host.social_links = { X: 1234567890 }
+    assert_equal false, @host.valid?
+    assert_equal "URL for X must be a string", @host.errors[:social_links].last
+  end
 end
