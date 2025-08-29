@@ -19,7 +19,7 @@ services:
     networks:
       - casmitter_network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U casmitter"]
+      test: ["CMD-SHELL", "pg_isready -U casmitter -d casmitter_staging"]
       interval: 30s
       timeout: 10s
       retries: 3
