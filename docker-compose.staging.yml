@@ -104,6 +104,7 @@ services:
     image: nginx:alpine
     container_name: casmitter_nginx_staging
     restart: unless-stopped
+
     ports:
       - "80:80"
       - "443:443"
@@ -115,6 +116,7 @@ services:
       - ./nginx/webroot:/var/www/html
       - ./nginx/logs:/var/log/nginx
       - ./public:/var/www/html
+
     depends_on:
       app:
         condition: service_healthy
