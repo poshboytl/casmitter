@@ -29,7 +29,9 @@ config/master.key
 .env
 .env*.local
 .env.staging
+staging.env.local
 .env.production
+production.env.local
 
 ## Environment normalization:
 /.bundle
