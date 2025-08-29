@@ -16,6 +16,15 @@ COMPOSE_FILE="docker-compose.staging.yml"
 ENV_FILE="staging.env"
 DOMAIN_NAME=$(grep DOMAIN_NAME $ENV_FILE | cut -d '=' -f2)
 
+# Determine docker compose command
+if command -v docker &> /dev/null && docker compose version &> /dev/null; then
+    DOCKER_COMPOSE="docker compose"
+elif command -v docker-compose &> /dev/null; then
+    DOCKER_COMPOSE="docker-compose"
+else
+    DOCKER_COMPOSE=""
+fi
+
 # Load environment variables
 if [ -f "$ENV_FILE" ]; then
     # Source the file instead of export to handle spaces in values
@@ -48,11 +57,13 @@ check_dependencies() {
         exit 1
     fi
     
-    if ! command -v docker-compose &> /dev/null; then
-        log_error "Docker Compose is not installed"
+    if [ -z "$DOCKER_COMPOSE" ]; then
+        log_error "Neither 'docker compose' nor 'docker-compose' is available"
+        log_error "Please install Docker Compose or ensure Docker Desktop is up to date"
         exit 1
     fi
     
+    log_info "Using: $DOCKER_COMPOSE"
     log_info "Dependencies check passed"
 }
 
@@ -74,13 +85,13 @@ setup_ssl() {
     log_info "Setting up SSL certificates..."
     
     # Stop nginx temporarily to free up port 80
-    docker-compose -f $COMPOSE_FILE stop nginx
+    $DOCKER_COMPOSE -f $COMPOSE_FILE stop nginx
     
     # Run certbot to obtain certificates
-    docker-compose -f $COMPOSE_FILE run --rm certbot
+    $DOCKER_COMPOSE -f $COMPOSE_FILE run --rm certbot
     
     # Start nginx again
-    docker-compose -f $COMPOSE_FILE up -d nginx
+    $DOCKER_COMPOSE -f $COMPOSE_FILE up -d nginx
     
     log_info "SSL setup completed"
 }
@@ -92,7 +103,7 @@ start_services() {
     create_directories
     
     # Start all services
-    docker-compose -f $COMPOSE_FILE up -d
+    $DOCKER_COMPOSE -f $COMPOSE_FILE up -d
     
     log_info "Services started successfully"
     log_info "Application will be available at: https://$DOMAIN_NAME"
@@ -101,7 +112,7 @@ start_services() {
 stop_services() {
     log_info "Stopping staging services..."
     
-    docker-compose -f $COMPOSE_FILE down
+    $DOCKER_COMPOSE -f $COMPOSE_FILE down
     
     log_info "Services stopped"
 }
@@ -109,7 +120,7 @@ stop_services() {
 restart_services() {
     log_info "Restarting staging services..."
     
-    docker-compose -f $COMPOSE_FILE restart
+    $DOCKER_COMPOSE -f $COMPOSE_FILE restart
     
     log_info "Services restarted"
 }
@@ -117,13 +128,13 @@ restart_services() {
 show_logs() {
     log_info "Showing logs for all services..."
     
-    docker-compose -f $COMPOSE_FILE logs -f
+    $DOCKER_COMPOSE -f $COMPOSE_FILE logs -f
 }
 
 show_status() {
     log_info "Service status:"
     
-    docker-compose -f $COMPOSE_FILE ps
+    $DOCKER_COMPOSE -f $COMPOSE_FILE ps
 }
 
 setup_database() {
@@ -131,17 +142,11 @@ setup_database() {
     
     # Wait for database to be ready
     log_info "Waiting for database to be ready..."
-    docker-compose -f $COMPOSE_FILE exec -T postgres pg_isready -U casmitter
+    $DOCKER_COMPOSE -f $COMPOSE_FILE exec -T postgres pg_isready -U casmitter
     
     # Run database migrations
     log_info "Running database migrations..."
-    docker-compose -f $COMPOSE_FILE exec -T app bundle exec rails db:migrate
-    
-    # Seed database if needed
-    if [ -f "db/seeds.rb" ]; then
-        log_info "Seeding database..."
-        docker-compose -f $COMPOSE_FILE exec -T app bundle exec rails db:seed
-    fi
+    $DOCKER_COMPOSE -f $COMPOSE_FILE exec -T app bundle exec rails db:migrate
     
     log_info "Database setup completed"
 }
