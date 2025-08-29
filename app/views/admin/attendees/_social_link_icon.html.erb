@@ -1,0 +1,24 @@
+<%
+  # Map platform names to FontAwesome icons and colors
+  icon_map = {
+    'twitter' => { icon: 'fab fa-twitter', color: 'text-blue-400' },
+    'x' => { icon: 'fab fa-x-twitter', color: 'text-gray-900' },
+    'weibo' => { icon: 'fab fa-weibo', color: 'text-red-500' },
+    'mastodon' => { icon: 'fab fa-mastodon', color: 'text-purple-500' },
+    'linkedin' => { icon: 'fab fa-linkedin', color: 'text-blue-700' },
+    'github' => { icon: 'fab fa-github', color: 'text-gray-900' },
+    'instagram' => { icon: 'fab fa-instagram', color: 'text-pink-500' },
+    'youtube' => { icon: 'fab fa-youtube', color: 'text-red-600' },
+    'tiktok' => { icon: 'fab fa-tiktok', color: 'text-gray-900' },
+    'facebook' => { icon: 'fab fa-facebook', color: 'text-blue-600' },
+    'discord' => { icon: 'fab fa-discord', color: 'text-indigo-500' },
+    'telegram' => { icon: 'fab fa-telegram', color: 'text-blue-500' },
+    'reddit' => { icon: 'fab fa-reddit', color: 'text-orange-500' },
+    'twitch' => { icon: 'fab fa-twitch', color: 'text-purple-600' }
+  }
+  
+  platform_key = platform.to_s.downcase
+  platform_config = icon_map[platform_key] || { icon: 'fas fa-link', color: 'text-gray-500' }
+%>
+
+<i class="<%= platform_config[:icon] %> <%= platform_config[:color] %>"></i>

@@ -5,12 +5,18 @@ jason:
   bio: "主持人，软件工程师"
   avatar_url: "https://example.com/avatars/jason.jpg"
   type: "Host"
+  social_links:
+    X: "https://x.com/jason"
+    Twitter: "https://twitter.com/jason"
 
 kevin:
   name: "Kevin"
   bio: "区块链技术专家"
   avatar_url: "https://example.com/avatars/kevin.jpg"
   type: "Guest"
+  social_links:
+    X: "https://x.com/kevin"
+    Twitter: "https://twitter.com/kevin"
 
 sarah:
   name: "Sarah"

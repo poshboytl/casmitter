@@ -3,6 +3,16 @@ Attendance.delete_all
 Episode.delete_all
 Guest.delete_all
 Host.delete_all
+User.delete_all
+
+puts "Creating default users..."
+admin_user = User.create!(
+  email_address: "admin@teahour.dev",
+  password: "password123",
+  password_confirmation: "password123"
+)
+
+puts "Created admin user: #{admin_user.email_address}"
 
 puts "Creating hosts..."
 terry = Host.create!(name: "Terry Tai", bio: "Co-Host of Teahour, Nervos Co-Founder", desc: "写代码为生，并以此为乐。",

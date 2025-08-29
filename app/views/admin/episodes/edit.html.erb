@@ -1,0 +1,23 @@
+<div class="max-w-4xl mx-auto">
+  <!-- Page Header -->
+  <div class="mb-8">
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-900">Edit Episode</h1>
+        <p class="mt-2 text-gray-600">Update episode information</p>
+      </div>
+      <%= link_to admin_episodes_path, class: "text-gray-500 hover:text-gray-700" do %>
+        <i class="fas fa-arrow-left mr-2"></i>Back to Episodes
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Form -->
+  <div class="bg-white shadow rounded-lg">
+    <div class="px-6 py-4 border-b border-gray-200">
+      <h3 class="text-lg font-medium text-gray-900">Episode Details</h3>
+    </div>
+    
+    <%= render 'form', submit_text: 'Update Episode' %>
+  </div>
+</div>
