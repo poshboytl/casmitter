@@ -52,8 +52,17 @@ services:
     environment:
       RAILS_ENV: staging
       SECRET_KEY_BASE: ${SECRET_KEY_BASE}
-      DATABASE_URL: postgresql://casmitter:${POSTGRES_PASSWORD}@postgres:5432/casmitter_staging
-      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379/0
+      # Database configuration - use individual variables instead of DATABASE_URL
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      DATABASE_NAME: casmitter_staging
+      DATABASE_USERNAME: casmitter
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD}
+      # Redis configuration
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      # Rails configuration
       RAILS_SERVE_STATIC_FILES: "true"
       RAILS_LOG_TO_STDOUT: "true"
       RAILS_MAX_THREADS: 5
