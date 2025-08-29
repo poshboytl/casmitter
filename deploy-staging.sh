@@ -300,7 +300,7 @@ setup_database() {
     
     # Wait for database to be ready
     log_info "Waiting for database to be ready..."
-    $DOCKER_COMPOSE -f $COMPOSE_FILE --env-file $ENV_FILE exec -T postgres pg_isready -U casmitter
+    $DOCKER_COMPOSE -f $COMPOSE_FILE --env-file $ENV_FILE exec -T postgres pg_isready -U casmitter_staging
     
     # Run database migrations
     log_info "Running database migrations..."
