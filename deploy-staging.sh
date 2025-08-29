@@ -113,12 +113,28 @@ check_ssl_certificates() {
             local current_date=$(date +%s)
             local days_until_expiry=$(( (expiry_date - current_date) / 86400 ))
             
-            if [ $days_until_expiry -gt 30 ]; then
-                log_info "SSL certificates are valid and will expire in $days_until_expiry days"
-                return 0
+            # Check if it's a self-signed certificate
+            local issuer=$(openssl x509 -issuer -noout -in "$cert_file" 2>/dev/null | grep -o "CN=.*" | cut -d= -f2)
+            local subject=$(openssl x509 -subject -noout -in "$cert_file" 2>/dev/null | grep -o "CN=.*" | cut -d= -f2)
+            
+            if [ "$issuer" = "$subject" ]; then
+                log_info "Self-signed SSL certificate found (valid until $cert_expiry)"
+                if [ $days_until_expiry -gt 30 ]; then
+                    log_info "Certificate will expire in $days_until_expiry days"
+                    return 0
+                else
+                    log_warn "Certificate will expire in $days_until_expiry days"
+                    return 1
+                fi
             else
-                log_warn "SSL certificates will expire in $days_until_expiry days"
-                return 1
+                # Let's Encrypt or other CA certificate
+                if [ $days_until_expiry -gt 30 ]; then
+                    log_info "SSL certificates are valid and will expire in $days_until_expiry days"
+                    return 0
+                else
+                    log_warn "SSL certificates will expire in $days_until_expiry days"
+                    return 1
+                fi
             fi
         else
             log_warn "Could not determine certificate expiry date"
@@ -260,7 +276,20 @@ show_status() {
     echo ""
     log_info "SSL Certificate Status:"
     if check_ssl_certificates; then
-        echo -e "${GREEN}✓ SSL certificates are valid${NC}"
+        local cert_file="nginx/ssl/live/${DOMAIN_NAME}/fullchain.pem"
+        if [ -f "$cert_file" ]; then
+            local issuer=$(openssl x509 -issuer -noout -in "$cert_file" 2>/dev/null | grep -o "CN=.*" | cut -d= -f2)
+            local subject=$(openssl x509 -subject -noout -in "$cert_file" 2>/dev/null | grep -o "CN=.*" | cut -d= -f2)
+            
+            if [ "$issuer" = "$subject" ]; then
+                echo -e "${GREEN}✓ Self-signed SSL certificate is valid${NC}"
+                echo -e "${YELLOW}⚠ Note: Self-signed certificates will show browser warnings${NC}"
+            else
+                echo -e "${GREEN}✓ SSL certificates from CA are valid${NC}"
+            fi
+        else
+            echo -e "${GREEN}✓ SSL certificates are valid${NC}"
+        fi
     else
         echo -e "${YELLOW}⚠ SSL certificates need attention${NC}"
     fi
@@ -329,6 +358,15 @@ case "${1:-start}" in
     auto-ssl)
         auto_ssl_setup
         ;;
+    self-signed-ssl)
+        log_info "Generating self-signed SSL certificates..."
+        if [ -f "./generate-self-signed-ssl.sh" ]; then
+            ./generate-self-signed-ssl.sh
+        else
+            log_error "Self-signed SSL script not found"
+            exit 1
+        fi
+        ;;
     setup-db)
         setup_database
         ;;
@@ -336,7 +374,7 @@ case "${1:-start}" in
         generate_secret_key
         ;;
     *)
-        echo "Usage: $0 {start|stop|restart|logs|status|ssl|auto-ssl|setup-db|generate-secret}"
+        echo "Usage: $0 {start|stop|restart|logs|status|ssl|auto-ssl|self-signed-ssl|setup-db|generate-secret}"
         echo ""
         echo "Commands:"
         echo "  start           - Start all staging services with automatic SSL setup"
@@ -344,8 +382,9 @@ case "${1:-start}" in
         echo "  restart         - Restart all staging services"
         echo "  logs            - Show logs for all services"
         echo "  status          - Show service status and SSL certificate status"
-        echo "  ssl             - Manually setup SSL certificates"
+        echo "  ssl             - Manually setup SSL certificates (requires public domain)"
         echo "  auto-ssl        - Automatically manage SSL certificates"
+        echo "  self-signed-ssl - Generate self-signed SSL certificates for local development"
         echo "  setup-db        - Setup database (migrations, seeds)"
         echo "  generate-secret - Generate new SECRET_KEY_BASE"
         exit 1
