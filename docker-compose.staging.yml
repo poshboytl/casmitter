@@ -46,7 +46,7 @@ services:
   app:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.staging
     container_name: casmitter_app_staging
     restart: unless-stopped
     environment:
