@@ -1,0 +1,64 @@
+# Staging environment specific ignores
+
+# Development files
+.env*
+!.env.staging
+!.env.staging.example
+.env.local
+.env.development
+.env.test
+
+# Documentation
+README.md
+STAGING_DEPLOYMENT.md
+CLAUDE.md
+LICENSE
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+log/*
+!log/.keep
+tmp/*
+!tmp/.keep
+
+# Test files
+test/
+spec/
+coverage/
+
+# Development dependencies
+node_modules/
+vendor/bundle/
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+
+# Backup files
+*.bak
+*.backup
+*~
+
+# Docker files (avoid recursive copying)
+Dockerfile*
+docker-compose*.yml
+.dockerignore*
+
+# Deployment scripts
+deploy-*.sh
+*.env.local

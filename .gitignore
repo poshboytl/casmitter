@@ -28,6 +28,8 @@ config/master.key
 # TODO Comment out these rules if environment variables can be committed
 .env
 .env*.local
+.env.staging
+.env.production
 
 ## Environment normalization:
 /.bundle
@@ -73,3 +75,4 @@ yarn-debug.log*
 
 /app/assets/builds/*
 !/app/assets/builds/.keep
+staging.env
