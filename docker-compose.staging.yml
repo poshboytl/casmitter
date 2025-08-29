@@ -6,6 +6,8 @@ services:
     image: postgres:15-alpine
     container_name: casmitter_postgres_staging
     restart: unless-stopped
+    env_file:
+      - staging.env
     environment:
       POSTGRES_DB: casmitter_staging
       POSTGRES_USER: casmitter
@@ -29,6 +31,8 @@ services:
     image: redis:7-alpine
     container_name: casmitter_redis_staging
     restart: unless-stopped
+    env_file:
+      - staging.env
     command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
     volumes:
       - redis_data:/data
@@ -49,6 +53,8 @@ services:
       dockerfile: Dockerfile.staging
     container_name: casmitter_app_staging
     restart: unless-stopped
+    env_file:
+      - staging.env
     environment:
       RAILS_ENV: staging
       SECRET_KEY_BASE: ${SECRET_KEY_BASE}
@@ -121,6 +127,8 @@ services:
   certbot:
     image: certbot/certbot
     container_name: casmitter_certbot_staging
+    env_file:
+      - staging.env
     volumes:
       - ./nginx/ssl:/etc/letsencrypt
       - ./nginx/webroot:/var/www/html

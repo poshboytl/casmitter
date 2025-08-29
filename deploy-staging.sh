@@ -25,7 +25,7 @@ else
     DOCKER_COMPOSE=""
 fi
 
-# Load environment variables
+# Load environment variables for script use
 if [ -f "$ENV_FILE" ]; then
     # Source the file instead of export to handle spaces in values
     set -a
@@ -103,13 +103,13 @@ setup_ssl() {
     log_info "Setting up SSL certificates..."
     
     # Stop nginx temporarily to free up port 80
-    $DOCKER_COMPOSE -f $COMPOSE_FILE stop nginx
+    $DOCKER_COMPOSE -f $COMPOSE_FILE --env-file $ENV_FILE stop nginx
     
     # Run certbot to obtain certificates
-    $DOCKER_COMPOSE -f $COMPOSE_FILE run --rm certbot
+    $DOCKER_COMPOSE -f $COMPOSE_FILE --env-file $ENV_FILE run --rm certbot
     
     # Start nginx again
-    $DOCKER_COMPOSE -f $COMPOSE_FILE up -d nginx
+    $DOCKER_COMPOSE -f $COMPOSE_FILE --env-file $ENV_FILE up -d nginx
     
     log_info "SSL setup completed"
 }
@@ -121,7 +121,7 @@ start_services() {
     create_directories
     
     # Start all services
-    $DOCKER_COMPOSE -f $COMPOSE_FILE up -d
+    $DOCKER_COMPOSE -f $COMPOSE_FILE --env-file $ENV_FILE up -d
     
     log_info "Services started successfully"
     log_info "Application will be available at: https://$DOMAIN_NAME"
@@ -130,7 +130,7 @@ start_services() {
 stop_services() {
     log_info "Stopping staging services..."
     
-    $DOCKER_COMPOSE -f $COMPOSE_FILE down
+    $DOCKER_COMPOSE -f $COMPOSE_FILE --env-file $ENV_FILE down
     
     log_info "Services stopped"
 }
@@ -138,7 +138,7 @@ stop_services() {
 restart_services() {
     log_info "Restarting staging services..."
     
-    $DOCKER_COMPOSE -f $COMPOSE_FILE restart
+    $DOCKER_COMPOSE -f $COMPOSE_FILE --env-file $ENV_FILE restart
     
     log_info "Services restarted"
 }
@@ -146,13 +146,13 @@ restart_services() {
 show_logs() {
     log_info "Showing logs for all services..."
     
-    $DOCKER_COMPOSE -f $COMPOSE_FILE logs -f
+    $DOCKER_COMPOSE -f $COMPOSE_FILE --env-file $ENV_FILE logs -f
 }
 
 show_status() {
     log_info "Service status:"
     
-    $DOCKER_COMPOSE -f $COMPOSE_FILE ps
+    $DOCKER_COMPOSE -f $COMPOSE_FILE --env-file $ENV_FILE ps
 }
 
 setup_database() {
@@ -160,11 +160,11 @@ setup_database() {
     
     # Wait for database to be ready
     log_info "Waiting for database to be ready..."
-    $DOCKER_COMPOSE -f $COMPOSE_FILE exec -T postgres pg_isready -U casmitter
+    $DOCKER_COMPOSE -f $COMPOSE_FILE --env-file $ENV_FILE exec -T postgres pg_isready -U casmitter
     
     # Run database migrations
     log_info "Running database migrations..."
-    $DOCKER_COMPOSE -f $COMPOSE_FILE exec -T app bundle exec rails db:migrate
+    $DOCKER_COMPOSE -f $COMPOSE_FILE --env-file $ENV_FILE exec -T app bundle exec rails db:migrate
     
     log_info "Database setup completed"
 }
