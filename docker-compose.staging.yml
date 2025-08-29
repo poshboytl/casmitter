@@ -59,8 +59,8 @@ services:
       # Database configuration - use individual variables instead of DATABASE_URL
       DATABASE_HOST: postgres
       DATABASE_PORT: 5432
-      DATABASE_NAME: casmitter_staging
-      DATABASE_USERNAME: casmitter
+      DATABASE_NAME: ${POSTGRES_DB}
+      DATABASE_USERNAME: ${POSTGRES_USER}
       DATABASE_PASSWORD: ${POSTGRES_PASSWORD}
       # Redis configuration
       REDIS_HOST: redis
