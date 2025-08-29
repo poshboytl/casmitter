@@ -63,6 +63,24 @@ check_dependencies() {
         exit 1
     fi
     
+    # Check for libpq-dev package (PostgreSQL client library)
+    if ! dpkg -l | grep -q "libpq-dev"; then
+        log_warn "libpq-dev package is not installed"
+        log_warn "This package is required for PostgreSQL gem compilation"
+        log_warn "Please install it using: sudo apt install libpq-dev"
+        log_warn "Or on other systems: sudo yum install postgresql-devel (RHEL/CentOS)"
+        log_warn "Continuing deployment, but gem installation may fail..."
+        echo ""
+        read -p "Do you want to continue anyway? (y/N): " -n 1 -r
+        echo ""
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            log_info "Installation cancelled. Please install libpq-dev and try again."
+            exit 1
+        fi
+    else
+        log_info "libpq-dev package is installed"
+    fi
+    
     log_info "Using: $DOCKER_COMPOSE"
     log_info "Dependencies check passed"
 }
