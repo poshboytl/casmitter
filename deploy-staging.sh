@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Staging Deployment Script for Casmitter
-# Usage: ./deploy-staging.sh [start|stop|restart|logs|ssl]
+# Usage: ./deploy-staging.sh [start|stop|restart|logs|ssl|auto-ssl]
 
 set -e
 
@@ -99,19 +99,102 @@ create_directories() {
     log_info "Directories created"
 }
 
-setup_ssl() {
+check_ssl_certificates() {
+    log_info "Checking SSL certificates..."
+    
+    local cert_file="nginx/ssl/live/${DOMAIN_NAME}/fullchain.pem"
+    local key_file="nginx/ssl/live/${DOMAIN_NAME}/privkey.pem"
+    
+    if [ -f "$cert_file" ] && [ -f "$key_file" ]; then
+        # Check if certificates are valid and not expired
+        local cert_expiry=$(openssl x509 -enddate -noout -in "$cert_file" 2>/dev/null | cut -d= -f2)
+        if [ -n "$cert_expiry" ]; then
+            local expiry_date=$(date -d "$cert_expiry" +%s 2>/dev/null)
+            local current_date=$(date +%s)
+            local days_until_expiry=$(( (expiry_date - current_date) / 86400 ))
+            
+            if [ $days_until_expiry -gt 30 ]; then
+                log_info "SSL certificates are valid and will expire in $days_until_expiry days"
+                return 0
+            else
+                log_warn "SSL certificates will expire in $days_until_expiry days"
+                return 1
+            fi
+        else
+            log_warn "Could not determine certificate expiry date"
+            return 1
+        fi
+    else
+        log_info "SSL certificates not found"
+        return 1
+    fi
+}
+
+setup_ssl_certificates() {
     log_info "Setting up SSL certificates..."
+    
+    # Check if we need to generate new certificates
+    if check_ssl_certificates; then
+        log_info "SSL certificates are valid, no need to regenerate"
+        return 0
+    fi
+    
+    log_info "Generating new SSL certificates..."
     
     # Stop nginx temporarily to free up port 80
     $DOCKER_COMPOSE -f $COMPOSE_FILE --env-file $ENV_FILE stop nginx
     
+    # Clean up old certificates if they exist
+    if [ -d "nginx/ssl/live" ]; then
+        log_info "Cleaning up old certificates..."
+        rm -rf nginx/ssl/live
+    fi
+    
     # Run certbot to obtain certificates
-    $DOCKER_COMPOSE -f $COMPOSE_FILE --env-file $ENV_FILE run --rm certbot
+    log_info "Running certbot to obtain certificates..."
+    if $DOCKER_COMPOSE -f $COMPOSE_FILE --env-file $ENV_FILE run --rm certbot; then
+        log_info "SSL certificates generated successfully"
+        
+        # Set proper permissions
+        chmod -R 644 nginx/ssl/live
+        chmod -R 600 nginx/ssl/live/*/privkey.pem
+        
+        # Start nginx again
+        $DOCKER_COMPOSE -f $COMPOSE_FILE --env-file $ENV_FILE up -d nginx
+        
+        log_info "SSL setup completed successfully"
+        return 0
+    else
+        log_error "Failed to generate SSL certificates"
+        
+        # Start nginx in HTTP-only mode
+        log_info "Starting nginx in HTTP-only mode..."
+        $DOCKER_COMPOSE -f $COMPOSE_FILE --env-file $ENV_FILE up -d nginx
+        
+        return 1
+    fi
+}
+
+auto_ssl_setup() {
+    log_info "Setting up automatic SSL certificate management..."
     
-    # Start nginx again
-    $DOCKER_COMPOSE -f $COMPOSE_FILE --env-file $ENV_FILE up -d nginx
-    
-    log_info "SSL setup completed"
+    # Check if certificates exist and are valid
+    if check_ssl_certificates; then
+        log_info "SSL certificates are valid"
+        
+        # Check if renewal is needed (within 30 days)
+        local cert_file="nginx/ssl/live/${DOMAIN_NAME}/fullchain.pem"
+        local expiry_date=$(openssl x509 -enddate -noout -in "$cert_file" 2>/dev/null | cut -d= -f2)
+        local days_until_expiry=$(( ($(date -d "$expiry_date" +%s) - $(date +%s)) / 86400 ))
+        
+        if [ $days_until_expiry -le 30 ]; then
+            log_info "Certificates will expire soon, attempting renewal..."
+            setup_ssl_certificates
+        fi
+    else
+        log_info "No valid certificates found, generating new ones..."
+        setup_ssl_certificates
+    fi
 }
 
 start_services() {
@@ -120,11 +203,31 @@ start_services() {
     # Create directories first
     create_directories
     
-    # Start all services
-    $DOCKER_COMPOSE -f $COMPOSE_FILE --env-file $ENV_FILE up -d
+    # Start core services (without nginx first)
+    log_info "Starting core services..."
+    $DOCKER_COMPOSE -f $COMPOSE_FILE --env-file $ENV_FILE up -d postgres redis app
+    
+    # Wait for app to be ready
+    log_info "Waiting for application to be ready..."
+    sleep 30
+    
+    # Setup SSL certificates
+    auto_ssl_setup
+    
+    # Start nginx (will be started by SSL setup if successful)
+    if ! $DOCKER_COMPOSE -f $COMPOSE_FILE --env-file $ENV_FILE ps nginx | grep -q "Up"; then
+        log_info "Starting nginx..."
+        $DOCKER_COMPOSE -f $COMPOSE_FILE --env-file $ENV_FILE up -d nginx
+    fi
     
     log_info "Services started successfully"
-    log_info "Application will be available at: https://$DOMAIN_NAME"
+    
+    # Check final status
+    if check_ssl_certificates; then
+        log_info "Application will be available at: https://$DOMAIN_NAME"
+    else
+        log_info "Application will be available at: http://$DOMAIN_NAME (SSL not configured)"
+    fi
 }
 
 stop_services() {
@@ -153,6 +256,14 @@ show_status() {
     log_info "Service status:"
     
     $DOCKER_COMPOSE -f $COMPOSE_FILE --env-file $ENV_FILE ps
+    
+    echo ""
+    log_info "SSL Certificate Status:"
+    if check_ssl_certificates; then
+        echo -e "${GREEN}✓ SSL certificates are valid${NC}"
+    else
+        echo -e "${YELLOW}⚠ SSL certificates need attention${NC}"
+    fi
 }
 
 setup_database() {
@@ -213,7 +324,10 @@ case "${1:-start}" in
         show_status
         ;;
     ssl)
-        setup_ssl
+        setup_ssl_certificates
+        ;;
+    auto-ssl)
+        auto_ssl_setup
         ;;
     setup-db)
         setup_database
@@ -222,15 +336,16 @@ case "${1:-start}" in
         generate_secret_key
         ;;
     *)
-        echo "Usage: $0 {start|stop|restart|logs|status|ssl|setup-db|generate-secret}"
+        echo "Usage: $0 {start|stop|restart|logs|status|ssl|auto-ssl|setup-db|generate-secret}"
         echo ""
         echo "Commands:"
-        echo "  start           - Start all staging services"
+        echo "  start           - Start all staging services with automatic SSL setup"
         echo "  stop            - Stop all staging services"
         echo "  restart         - Restart all staging services"
         echo "  logs            - Show logs for all services"
-        echo "  status          - Show service status"
-        echo "  ssl             - Setup SSL certificates"
+        echo "  status          - Show service status and SSL certificate status"
+        echo "  ssl             - Manually setup SSL certificates"
+        echo "  auto-ssl        - Automatically manage SSL certificates"
         echo "  setup-db        - Setup database (migrations, seeds)"
         echo "  generate-secret - Generate new SECRET_KEY_BASE"
         exit 1

@@ -110,6 +110,7 @@ services:
       - ./nginx/ssl.conf:/etc/nginx/ssl.conf:ro
       - ./nginx/conf.d:/etc/nginx/conf.d:ro
       - ./nginx/ssl:/etc/nginx/ssl
+      - ./nginx/webroot:/var/www/html
       - ./nginx/logs:/var/log/nginx
       - ./public:/var/www/html:ro
     depends_on:
@@ -118,7 +119,7 @@ services:
     networks:
       - casmitter_network
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/up"]
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://app:3000/up"]
       interval: 30s
       timeout: 10s
       retries: 3
