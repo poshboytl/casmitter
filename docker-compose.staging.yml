@@ -112,7 +112,7 @@ services:
       - ./nginx/ssl:/etc/nginx/ssl
       - ./nginx/webroot:/var/www/html
       - ./nginx/logs:/var/log/nginx
-      - ./public:/var/www/html:ro
+      - ./public:/var/www/html
     depends_on:
       app:
         condition: service_healthy
