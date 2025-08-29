@@ -56,12 +56,16 @@ services:
     environment:
       RAILS_ENV: staging
       SECRET_KEY_BASE: ${SECRET_KEY_BASE}
-      # Database configuration - use individual variables instead of DATABASE_URL
+      # Database configuration - map PostgreSQL env vars to Rails expected vars
       DATABASE_HOST: postgres
       DATABASE_PORT: 5432
       DATABASE_NAME: ${POSTGRES_DB}
       DATABASE_USERNAME: ${POSTGRES_USER}
       DATABASE_PASSWORD: ${POSTGRES_PASSWORD}
+      # Also set the original PostgreSQL vars for compatibility
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       # Redis configuration
       REDIS_HOST: redis
       REDIS_PORT: 6379
