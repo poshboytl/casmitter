@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Multi-Environment Deployment Script for Casmitter
-# Usage: ./deploy.sh [start|stop|restart|logs|ssl|auto-ssl|cert-only|full-deploy] [options]
+# Usage: ./deploy.sh [start|stop|restart|logs|status|cert-only|debug-cert] [options]
 # Options:
 #   -b, --branch <branch>    Git branch to pull before deployment (e.g., -b staging)
 
@@ -393,27 +393,7 @@ setup_ssl_certificates() {
     fi
 }
 
-auto_ssl_setup() {
-    log_info "Setting up automatic SSL certificate management..."
-    
-    # Check if certificates exist and are valid
-    if check_ssl_certificates; then
-        log_info "SSL certificates from CA are valid"
-        
-        # Check if renewal is needed (within 30 days)
-        local cert_file="nginx/ssl/live/${DOMAIN_NAME}/fullchain.pem"
-        local expiry_date=$(openssl x509 -enddate -noout -in "$cert_file" 2>/dev/null | cut -d= -f2)
-        local days_until_expiry=$(( ($(date -d "$expiry_date" +%s) - $(date +%s)) / 86400 ))
-        
-        if [ $days_until_expiry -le 30 ]; then
-            log_info "Certificates will expire soon, attempting renewal..."
-            setup_ssl_certificates
-        fi
-    else
-        log_info "No valid CA certificates found, attempting to obtain Let's Encrypt certificates..."
-        setup_ssl_certificates
-    fi
-}
+
 
 start_services() {
     log_info "Starting $ENVIRONMENT services..."
@@ -535,56 +515,9 @@ setup_database() {
     log_info "Database setup completed"
 }
 
-generate_secret_key() {
-    log_info "Generating new SECRET_KEY_BASE..."
-    
-    # Generate a new secret key
-    NEW_SECRET=$(ruby -e "require 'securerandom'; puts SecureRandom.hex(64)")
-    
-    if [ $? -eq 0 ]; then
-        log_info "New SECRET_KEY_BASE generated successfully!"
-        echo ""
-        echo "Add this to your staging.env file:"
-        echo "SECRET_KEY_BASE=$NEW_SECRET"
-        echo ""
-        echo "Or update the existing line in staging.env"
-    else
-        log_error "Failed to generate SECRET_KEY_BASE"
-        log_info "You can manually generate one using:"
-        log_info "ruby -e \"require 'securerandom'; puts SecureRandom.hex(64)\""
-    fi
-}
 
-clean_ssl_certificates() {
-    log_info "Cleaning up SSL certificates and related files..."
-    
-    # Stop any running nginx containers
-    docker stop nginx-certbot 2>/dev/null || true
-    docker rm nginx-certbot 2>/dev/null || true
-    
-    # Remove live directory (contains symlinks and potentially self-signed certs)
-    if [ -d "nginx/ssl/live" ]; then
-        log_info "Removing nginx/ssl/live directory..."
-        rm -rf nginx/ssl/live
-    fi
-    
-    # Remove webroot (will be recreated when needed)
-    if [ -d "nginx/webroot" ]; then
-        log_info "Removing nginx/webroot directory..."
-        rm -rf nginx/webroot
-    fi
-    
-    # Check if we have valid Let's Encrypt certificates in archive
-    if [ -d "nginx/ssl/archive" ]; then
-        log_info "Found Let's Encrypt certificates in archive directory."
-        log_info "Run './fix-letsencrypt-structure.sh' to restore certificate structure."
-    else
-        log_info "No Let's Encrypt certificates found in archive."
-        log_info "Run './deploy.sh cert-only' to obtain new certificates."
-    fi
-    
-    log_info "SSL cleanup completed."
-}
+
+
 
 # Main script logic
 case "${1:-start}" in
@@ -620,34 +553,74 @@ case "${1:-start}" in
     status)
         show_status
         ;;
-    ssl)
-        setup_ssl_certificates
-        ;;
-    auto-ssl)
-        auto_ssl_setup
-        ;;
-    force-ssl)
-        log_info "Forcing Let's Encrypt SSL certificate setup..."
-        if [ -f "./force-letsencrypt.sh" ]; then
-            ./force-letsencrypt.sh
-        else
-            log_error "Force Let's Encrypt script not found"
-            exit 1
-        fi
-        ;;
-    setup-db)
-        setup_database
-        ;;
-    generate-secret)
-        generate_secret_key
-        ;;
-    clean-ssl)
-        log_info "Cleaning up all SSL certificates..."
-        clean_ssl_certificates
-        ;;
     cert-only)
         log_info "Running certificate only deployment..."
         check_dependencies
+        
+        # Check if we have valid certificates in archive that can be restored
+        if [ -d "nginx/ssl/archive" ]; then
+            log_info "Found SSL archive directory, checking for existing certificates..."
+            
+            # Look for valid certificates in archive
+            local archive_cert=$(find nginx/ssl/archive -name "fullchain*.pem" -path "*/${DOMAIN_NAME}*" 2>/dev/null | head -1)
+            local archive_key=$(find nginx/ssl/archive -name "privkey*.pem" -path "*/${DOMAIN_NAME}*" 2>/dev/null | head -1)
+            
+            if [ -n "$archive_cert" ] && [ -n "$archive_key" ] && [ -f "$archive_cert" ] && [ -f "$archive_key" ]; then
+                log_info "Found existing certificates in archive, attempting to restore structure..."
+                
+                # Check if certificate is valid and not expired
+                local cert_expiry=$(openssl x509 -enddate -noout -in "$archive_cert" 2>/dev/null | cut -d= -f2)
+                if [ -n "$cert_expiry" ]; then
+                    local expiry_date=$(date -d "$cert_expiry" +%s 2>/dev/null)
+                    local current_date=$(date +%s)
+                    local days_until_expiry=$(( (expiry_date - current_date) / 86400 ))
+                    
+                    if [ $days_until_expiry -gt 0 ]; then
+                        log_info "Certificate is valid and expires in $days_until_expiry days"
+                        
+                        # Check if it's a Let's Encrypt certificate
+                        local issuer=$(openssl x509 -issuer -noout -in "$archive_cert" 2>/dev/null)
+                        if echo "$issuer" | grep -q "Let's Encrypt\|Let's Encrypt Authority\|Let's Encrypt Authority X3\|Let's Encrypt Authority X4"; then
+                            log_info "Let's Encrypt certificate detected, restoring directory structure..."
+                            
+                            # Create live directory structure
+                            mkdir -p "nginx/ssl/live/${DOMAIN_NAME}"
+                            
+                            # Find the latest certificate files
+                            local cert_file=$(find "nginx/ssl/archive/${DOMAIN_NAME}" -name "fullchain*.pem" | sort -V | tail -1)
+                            local key_file=$(find "nginx/ssl/archive/${DOMAIN_NAME}" -name "privkey*.pem" | sort -V | tail -1)
+                            local chain_file=$(find "nginx/ssl/archive/${DOMAIN_NAME}" -name "chain*.pem" | sort -V | tail -1)
+                            
+                            # Create symlinks
+                            ln -sf "../../archive/${DOMAIN_NAME}/$(basename $cert_file)" "nginx/ssl/live/${DOMAIN_NAME}/fullchain.pem"
+                            ln -sf "../../archive/${DOMAIN_NAME}/$(basename $key_file)" "nginx/ssl/live/${DOMAIN_NAME}/privkey.pem"
+                            
+                            if [ -n "$chain_file" ]; then
+                                ln -sf "../../archive/${DOMAIN_NAME}/$(basename $chain_file)" "nginx/ssl/live/${DOMAIN_NAME}/chain.pem"
+                            fi
+                            
+                            # Set proper permissions
+                            chmod 644 "nginx/ssl/live/${DOMAIN_NAME}/fullchain.pem" 2>/dev/null || true
+                            chmod 644 "nginx/ssl/live/${DOMAIN_NAME}/chain.pem" 2>/dev/null || true
+                            chmod 600 "nginx/ssl/live/${DOMAIN_NAME}/privkey.pem" 2>/dev/null || true
+                            
+                            log_info "Directory structure restored successfully!"
+                            log_info "Certificate will expire in $days_until_expiry days"
+                            return 0
+                        else
+                            log_warn "Certificate is not from Let's Encrypt, will request new certificate"
+                        fi
+                    else
+                        log_warn "Certificate has expired, will request new certificate"
+                    fi
+                else
+                    log_warn "Could not determine certificate expiry, will request new certificate"
+                fi
+            fi
+        fi
+        
+        # If we reach here, we need to get new certificates
+        log_info "No valid certificates found, requesting new Let's Encrypt certificates..."
         setup_ssl_certificates
         log_info "Certificate only deployment completed."
         ;;
@@ -666,18 +639,8 @@ case "${1:-start}" in
             log_info "No SSL directory found"
         fi
         ;;
-    full-deploy)
-        log_info "Running full deployment..."
-        check_dependencies
-        start_services
-        log_info "Waiting for services to be ready..."
-        sleep 30
-        setup_database
-        log_info "Deployment completed successfully!"
-        show_status
-        ;;
     *)
-        echo "Usage: $0 {start|stop|restart|logs|status|ssl|auto-ssl|force-ssl|setup-db|generate-secret|cert-only|full-deploy} [options]"
+        echo "Usage: $0 {start|stop|restart|logs|status|cert-only|debug-cert} [options]"
         echo ""
         echo "Environment: $ENVIRONMENT (configured in $ENV_FILE)"
         echo ""
@@ -687,15 +650,8 @@ case "${1:-start}" in
         echo "  restart         - Restart all $ENVIRONMENT services"
         echo "  logs            - Show logs for all services"
         echo "  status          - Show service status and SSL certificate status"
-        echo "  ssl             - Manually setup SSL certificates (requires public domain)"
-        echo "  auto-ssl        - Automatically manage SSL certificates"
-        echo "  force-ssl       - Force Let's Encrypt SSL certificate setup (removes existing certs)"
-        echo "  setup-db        - Setup database (migrations, seeds)"
-        echo "  generate-secret - Generate new SECRET_KEY_BASE"
-        echo "  clean-ssl       - Clean up all SSL certificates and related files"
         echo "  cert-only       - Only setup SSL certificates (for testing Let's Encrypt)"
         echo "  debug-cert      - Debug SSL certificate information and structure"
-        echo "  full-deploy     - Full deployment (pull code, start services, setup DB)"
         echo ""
         echo "Options:"
         echo "  -b, --branch <branch>  - Pull latest code from specified Git branch before deployment"
@@ -704,10 +660,8 @@ case "${1:-start}" in
         echo "  $0 start                    - Start services with current code"
         echo "  $0 start -b staging         - Pull staging branch and start services"
         echo "  $0 start --branch main      - Pull main branch and start services"
-        echo "  $0 clean-ssl                - Clean up all SSL certificates"
         echo "  $0 cert-only                - Only setup SSL certificates (for testing Let's Encrypt)"
         echo "  $0 debug-cert               - Debug SSL certificate information"
-        echo "  $0 full-deploy              - Full deployment (pull code, start services, setup DB)"
         exit 1
         ;;
 esac
