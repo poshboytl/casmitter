@@ -300,13 +300,14 @@ handle_certificates() {
                         
                         # Create live directory structure
                         mkdir -p "nginx/ssl/live/${DOMAIN_NAME}"
+                        mkdir -p "nginx/ssl/live/current"
                         
                         # Find the latest certificate files
                         local cert_file=$(find "nginx/ssl/archive/${DOMAIN_NAME}" -name "fullchain*.pem" | sort -V | tail -1)
                         local key_file=$(find "nginx/ssl/archive/${DOMAIN_NAME}" -name "privkey*.pem" | sort -V | tail -1)
                         local chain_file=$(find "nginx/ssl/archive/${DOMAIN_NAME}" -name "chain*.pem" | sort -V | tail -1)
                         
-                        # Create symlinks
+                        # Create symlinks for domain-specific directory
                         ln -sf "../../archive/${DOMAIN_NAME}/$(basename $cert_file)" "nginx/ssl/live/${DOMAIN_NAME}/fullchain.pem"
                         ln -sf "../../archive/${DOMAIN_NAME}/$(basename $key_file)" "nginx/ssl/live/${DOMAIN_NAME}/privkey.pem"
                         
@@ -314,10 +315,21 @@ handle_certificates() {
                             ln -sf "../../archive/${DOMAIN_NAME}/$(basename $chain_file)" "nginx/ssl/live/${DOMAIN_NAME}/chain.pem"
                         fi
                         
+                        # Create symlinks for nginx configuration (current)
+                        ln -sf "../../archive/${DOMAIN_NAME}/$(basename $cert_file)" "nginx/ssl/live/current/fullchain.pem"
+                        ln -sf "../../archive/${DOMAIN_NAME}/$(basename $key_file)" "nginx/ssl/live/current/privkey.pem"
+                        
+                        if [ -n "$chain_file" ]; then
+                            ln -sf "../../archive/${DOMAIN_NAME}/$(basename $chain_file)" "nginx/ssl/live/current/chain.pem"
+                        fi
+                        
                         # Set proper permissions
                         chmod 644 "nginx/ssl/live/${DOMAIN_NAME}/fullchain.pem" 2>/dev/null || true
                         chmod 644 "nginx/ssl/live/${DOMAIN_NAME}/chain.pem" 2>/dev/null || true
                         chmod 600 "nginx/ssl/live/${DOMAIN_NAME}/privkey.pem" 2>/dev/null || true
+                        chmod 644 "nginx/ssl/live/current/fullchain.pem" 2>/dev/null || true
+                        chmod 644 "nginx/ssl/live/current/chain.pem" 2>/dev/null || true
+                        chmod 600 "nginx/ssl/live/current/privkey.pem" 2>/dev/null || true
                         
                         log_info "Directory structure restored successfully!"
                         log_info "Certificate will expire in $days_until_expiry days"
@@ -414,6 +426,24 @@ setup_ssl_certificates() {
         # Set proper permissions
         chmod -R 644 nginx/ssl/live 2>/dev/null || true
         chmod -R 600 nginx/ssl/live/*/privkey.pem 2>/dev/null || true
+        
+        # Create current symlinks for nginx configuration
+        if [ -d "nginx/ssl/live" ]; then
+            local domain_dirs=$(find nginx/ssl/live -maxdepth 1 -type d -name "*" | grep -v "^nginx/ssl/live$" | grep -v "^nginx/ssl/live/current$")
+            if [ -n "$domain_dirs" ]; then
+                local first_domain=$(echo "$domain_dirs" | head -1 | sed 's|.*/||')
+                log_info "Creating current symlinks for nginx configuration..."
+                
+                mkdir -p "nginx/ssl/live/current"
+                ln -sf "../$first_domain/fullchain.pem" "nginx/ssl/live/current/fullchain.pem"
+                ln -sf "../$first_domain/privkey.pem" "nginx/ssl/live/current/privkey.pem"
+                ln -sf "../$first_domain/chain.pem" "nginx/ssl/live/current/chain.pem" 2>/dev/null || true
+                
+                chmod 644 "nginx/ssl/live/current/fullchain.pem" 2>/dev/null || true
+                chmod 644 "nginx/ssl/live/current/chain.pem" 2>/dev/null || true
+                chmod 600 "nginx/ssl/live/current/privkey.pem" 2>/dev/null || true
+            fi
+        fi
         
         # Display certificate and log file information
         log_info "Certificate files created:"
