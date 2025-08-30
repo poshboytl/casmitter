@@ -201,9 +201,16 @@ create_directories() {
 check_ssl_certificates() {
     log_info "Checking SSL certificates..."
     
-    # Use wildcard to find the correct certificate directory
+    # First try to find certificates in live directory (standard location)
     local cert_file=$(find nginx/ssl/live -name "fullchain.pem" -path "*/${DOMAIN_NAME}*" 2>/dev/null | head -1)
     local key_file=$(find nginx/ssl/live -name "privkey.pem" -path "*/${DOMAIN_NAME}*" 2>/dev/null | head -1)
+    
+    # If not found in live, check archive directory
+    if [ -z "$cert_file" ] || [ -z "$key_file" ]; then
+        log_info "Certificates not found in live directory, checking archive..."
+        cert_file=$(find nginx/ssl/archive -name "fullchain*.pem" -path "*/${DOMAIN_NAME}*" 2>/dev/null | head -1)
+        key_file=$(find nginx/ssl/archive -name "privkey*.pem" -path "*/${DOMAIN_NAME}*" 2>/dev/null | head -1)
+    fi
     
     if [ -n "$cert_file" ] && [ -n "$key_file" ] && [ -f "$cert_file" ] && [ -f "$key_file" ]; then
         # Check if certificates are valid and not expired
@@ -218,10 +225,15 @@ check_ssl_certificates() {
             local subject=$(openssl x509 -subject -noout -in "$cert_file" 2>/dev/null | grep -o "CN=.*" | cut -d= -f2)
             
             if [ "$issuer" = "$subject" ]; then
-                log_warn "Self-signed SSL certificate detected - removing it"
-                log_info "Self-signed certificates are not allowed. Removing and requesting Let's Encrypt certificate..."
-                # Remove the self-signed certificate
+                log_warn "Self-signed SSL certificate detected in live directory"
+                log_info "Removing live directory (contains symlinks to self-signed certs)..."
+                # Remove only the live directory (contains symlinks)
                 rm -rf nginx/ssl/live
+                
+                # Check if we have valid Let's Encrypt certificates in archive
+                if [ -d "nginx/ssl/archive" ]; then
+                    log_info "Found Let's Encrypt certificates in archive. Run './fix-letsencrypt-structure.sh' to restore."
+                fi
                 return 1
             else
                 # Let's Encrypt or other CA certificate
@@ -318,6 +330,35 @@ setup_ssl_certificates() {
         # Set proper permissions
         chmod -R 644 nginx/ssl/live 2>/dev/null || true
         chmod -R 600 nginx/ssl/live/*/privkey.pem 2>/dev/null || true
+        
+        # Display certificate and log file information
+        log_info "Certificate files created:"
+        if [ -d "nginx/ssl/live" ]; then
+            find nginx/ssl/live -name "*.pem" -type f 2>/dev/null | while read file; do
+                local file_size=$(du -h "$file" 2>/dev/null | cut -f1)
+                local file_perms=$(ls -la "$file" 2>/dev/null | awk '{print $1}')
+                log_info "  $file ($file_size, $file_perms)"
+            done
+        fi
+        
+        # Display log file information
+        log_info "Log files created:"
+        if [ -d "nginx/ssl/logs" ]; then
+            find nginx/ssl/logs -name "*.log" -type f 2>/dev/null | while read logfile; do
+                local log_size=$(du -h "$logfile" 2>/dev/null | cut -f1)
+                local log_perms=$(ls -la "$logfile" 2>/dev/null | awk '{print $1}')
+                log_info "  $logfile ($log_size, $log_perms)"
+            done
+        fi
+        
+        # Also check for certbot logs in the ssl directory
+        if [ -d "nginx/ssl" ]; then
+            find nginx/ssl -name "*.log" -type f 2>/dev/null | while read logfile; do
+                local log_size=$(du -h "$logfile" 2>/dev/null | cut -f1)
+                local log_perms=$(ls -la "$logfile" 2>/dev/null | awk '{print $1}')
+                log_info "  $logfile ($log_size, $log_perms)"
+            done
+        fi
         
         # Stop the temporary nginx container
         log_info "Stopping temporary nginx container..."
@@ -433,11 +474,32 @@ show_status() {
         echo -e "${GREEN}✓ SSL certificates from CA are valid${NC}"
         # Show certificate details
         local cert_file=$(find nginx/ssl/live -name "fullchain.pem" -path "*/${DOMAIN_NAME}*" 2>/dev/null | head -1)
+        if [ -z "$cert_file" ]; then
+            cert_file=$(find nginx/ssl/archive -name "fullchain*.pem" -path "*/${DOMAIN_NAME}*" 2>/dev/null | head -1)
+        fi
         if [ -n "$cert_file" ] && [ -f "$cert_file" ]; then
             local issuer=$(openssl x509 -issuer -noout -in "$cert_file" 2>/dev/null | grep -o "CN=.*" | cut -d= -f2)
             local expiry=$(openssl x509 -enddate -noout -in "$cert_file" 2>/dev/null | cut -d= -f2)
             echo -e "${GREEN}  Issuer: $issuer${NC}"
             echo -e "${GREEN}  Expires: $expiry${NC}"
+        fi
+        
+        # Show log file information
+        echo ""
+        log_info "SSL Log Files:"
+        if [ -d "nginx/ssl" ]; then
+            local log_count=0
+            find nginx/ssl -name "*.log" -type f 2>/dev/null | while read logfile; do
+                local log_size=$(du -h "$logfile" 2>/dev/null | cut -f1)
+                local log_perms=$(ls -la "$logfile" 2>/dev/null | awk '{print $1}')
+                echo -e "${GREEN}  $logfile${NC} ($log_size, $log_perms)"
+                log_count=$((log_count + 1))
+            done
+            if [ $log_count -eq 0 ]; then
+                echo -e "${YELLOW}  No log files found${NC}"
+            fi
+        else
+            echo -e "${YELLOW}  SSL directory not found${NC}"
         fi
     else
         echo -e "${YELLOW}⚠ SSL certificates need attention${NC}"
@@ -480,16 +542,16 @@ generate_secret_key() {
 }
 
 clean_ssl_certificates() {
-    log_info "Cleaning up all SSL certificates and related files..."
+    log_info "Cleaning up SSL certificates and related files..."
     
     # Stop any running nginx containers
     docker stop nginx-certbot 2>/dev/null || true
     docker rm nginx-certbot 2>/dev/null || true
     
-    # Remove all SSL-related directories
-    if [ -d "nginx/ssl" ]; then
-        log_info "Removing nginx/ssl directory..."
-        rm -rf nginx/ssl
+    # Remove live directory (contains symlinks and potentially self-signed certs)
+    if [ -d "nginx/ssl/live" ]; then
+        log_info "Removing nginx/ssl/live directory..."
+        rm -rf nginx/ssl/live
     fi
     
     # Remove webroot (will be recreated when needed)
@@ -498,8 +560,16 @@ clean_ssl_certificates() {
         rm -rf nginx/webroot
     fi
     
-    log_info "SSL cleanup completed. All certificates and related files have been removed."
-    log_info "Run './deploy.sh cert-only' to obtain new Let's Encrypt certificates."
+    # Check if we have valid Let's Encrypt certificates in archive
+    if [ -d "nginx/ssl/archive" ]; then
+        log_info "Found Let's Encrypt certificates in archive directory."
+        log_info "Run './fix-letsencrypt-structure.sh' to restore certificate structure."
+    else
+        log_info "No Let's Encrypt certificates found in archive."
+        log_info "Run './deploy.sh cert-only' to obtain new certificates."
+    fi
+    
+    log_info "SSL cleanup completed."
 }
 
 # Main script logic
