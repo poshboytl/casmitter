@@ -180,24 +180,6 @@ check_dependencies() {
         exit 1
     fi
     
-    # Check for libpq-dev package (PostgreSQL client library)
-    if ! dpkg -l | grep -q "libpq-dev"; then
-        log_warn "libpq-dev package is not installed"
-        log_warn "This package is required for PostgreSQL gem compilation"
-        log_warn "Please install it using: sudo apt install libpq-dev"
-        log_warn "Or on other systems: sudo yum install postgresql-devel (RHEL/CentOS)"
-        log_warn "Continuing deployment, but gem installation may fail..."
-        echo ""
-        read -p "Do you want to continue anyway? (y/N): " -n 1 -r
-        echo ""
-        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-            log_info "Installation cancelled. Please install libpq-dev and try again."
-            exit 1
-        fi
-    else
-        log_info "libpq-dev package is installed"
-    fi
-    
     log_info "Using: $DOCKER_COMPOSE"
     log_info "Dependencies check passed"
 }
@@ -231,14 +213,15 @@ check_ssl_certificates() {
             local current_date=$(date +%s)
             local days_until_expiry=$(( (expiry_date - current_date) / 86400 ))
             
-            # Check if it's a self-signed certificate
+            # Only accept Let's Encrypt or other CA certificates
             local issuer=$(openssl x509 -issuer -noout -in "$cert_file" 2>/dev/null | grep -o "CN=.*" | cut -d= -f2)
             local subject=$(openssl x509 -subject -noout -in "$cert_file" 2>/dev/null | grep -o "CN=.*" | cut -d= -f2)
             
             if [ "$issuer" = "$subject" ]; then
-                log_warn "Self-signed SSL certificate found (valid until $cert_expiry)"
-                log_warn "Self-signed certificates are not recommended for production use"
-                log_info "Attempting to obtain Let's Encrypt certificate instead..."
+                log_warn "Self-signed SSL certificate detected - removing it"
+                log_info "Self-signed certificates are not allowed. Removing and requesting Let's Encrypt certificate..."
+                # Remove the self-signed certificate
+                rm -rf nginx/ssl/live
                 return 1
             else
                 # Let's Encrypt or other CA certificate
@@ -263,11 +246,21 @@ check_ssl_certificates() {
 setup_ssl_certificates() {
     log_info "Setting up SSL certificates..."
     
-    # Always attempt to obtain Let's Encrypt certificates
-    # Remove any existing self-signed certificates
+    # Always clean up any existing certificates before requesting new ones
     if [ -d "nginx/ssl/live" ]; then
         log_info "Cleaning up existing certificates..."
         rm -rf nginx/ssl/live
+    fi
+    
+    # Also clean up any other SSL-related files
+    if [ -d "nginx/ssl/archive" ]; then
+        log_info "Cleaning up SSL archive..."
+        rm -rf nginx/ssl/archive
+    fi
+    
+    if [ -d "nginx/ssl/renewal" ]; then
+        log_info "Cleaning up SSL renewal configs..."
+        rm -rf nginx/ssl/renewal
     fi
     
     log_info "Attempting to obtain Let's Encrypt SSL certificates..."
@@ -437,22 +430,18 @@ show_status() {
     echo ""
     log_info "SSL Certificate Status:"
     if check_ssl_certificates; then
-        local cert_file="nginx/ssl/live/${DOMAIN_NAME}/fullchain.pem"
-        if [ -f "$cert_file" ]; then
+        echo -e "${GREEN}✓ SSL certificates from CA are valid${NC}"
+        # Show certificate details
+        local cert_file=$(find nginx/ssl/live -name "fullchain.pem" -path "*/${DOMAIN_NAME}*" 2>/dev/null | head -1)
+        if [ -n "$cert_file" ] && [ -f "$cert_file" ]; then
             local issuer=$(openssl x509 -issuer -noout -in "$cert_file" 2>/dev/null | grep -o "CN=.*" | cut -d= -f2)
-            local subject=$(openssl x509 -subject -noout -in "$cert_file" 2>/dev/null | grep -o "CN=.*" | cut -d= -f2)
-            
-            if [ "$issuer" = "$subject" ]; then
-                echo -e "${YELLOW}⚠ Self-signed SSL certificate found (not recommended)${NC}"
-                echo -e "${YELLOW}⚠ Attempting to obtain Let's Encrypt certificate...${NC}"
-            else
-                echo -e "${GREEN}✓ SSL certificates from CA are valid${NC}"
-            fi
-        else
-            echo -e "${GREEN}✓ SSL certificates are valid${NC}"
+            local expiry=$(openssl x509 -enddate -noout -in "$cert_file" 2>/dev/null | cut -d= -f2)
+            echo -e "${GREEN}  Issuer: $issuer${NC}"
+            echo -e "${GREEN}  Expires: $expiry${NC}"
         fi
     else
         echo -e "${YELLOW}⚠ SSL certificates need attention${NC}"
+        echo -e "${YELLOW}  Run './deploy.sh cert-only' to obtain Let's Encrypt certificates${NC}"
     fi
 }
 
@@ -488,6 +477,29 @@ generate_secret_key() {
         log_info "You can manually generate one using:"
         log_info "ruby -e \"require 'securerandom'; puts SecureRandom.hex(64)\""
     fi
+}
+
+clean_ssl_certificates() {
+    log_info "Cleaning up all SSL certificates and related files..."
+    
+    # Stop any running nginx containers
+    docker stop nginx-certbot 2>/dev/null || true
+    docker rm nginx-certbot 2>/dev/null || true
+    
+    # Remove all SSL-related directories
+    if [ -d "nginx/ssl" ]; then
+        log_info "Removing nginx/ssl directory..."
+        rm -rf nginx/ssl
+    fi
+    
+    # Remove webroot (will be recreated when needed)
+    if [ -d "nginx/webroot" ]; then
+        log_info "Removing nginx/webroot directory..."
+        rm -rf nginx/webroot
+    fi
+    
+    log_info "SSL cleanup completed. All certificates and related files have been removed."
+    log_info "Run './deploy.sh cert-only' to obtain new Let's Encrypt certificates."
 }
 
 # Main script logic
@@ -545,6 +557,10 @@ case "${1:-start}" in
     generate-secret)
         generate_secret_key
         ;;
+    clean-ssl)
+        log_info "Cleaning up all SSL certificates..."
+        clean_ssl_certificates
+        ;;
     cert-only)
         log_info "Running certificate only deployment..."
         check_dependencies
@@ -577,6 +593,7 @@ case "${1:-start}" in
         echo "  force-ssl       - Force Let's Encrypt SSL certificate setup (removes existing certs)"
         echo "  setup-db        - Setup database (migrations, seeds)"
         echo "  generate-secret - Generate new SECRET_KEY_BASE"
+        echo "  clean-ssl       - Clean up all SSL certificates and related files"
         echo "  cert-only       - Only setup SSL certificates (for testing Let's Encrypt)"
         echo "  full-deploy     - Full deployment (pull code, start services, setup DB)"
         echo ""
@@ -587,6 +604,7 @@ case "${1:-start}" in
         echo "  $0 start                    - Start services with current code"
         echo "  $0 start -b staging         - Pull staging branch and start services"
         echo "  $0 start --branch main      - Pull main branch and start services"
+        echo "  $0 clean-ssl                - Clean up all SSL certificates"
         echo "  $0 cert-only                - Only setup SSL certificates (for testing Let's Encrypt)"
         echo "  $0 full-deploy              - Full deployment (pull code, start services, setup DB)"
         exit 1
