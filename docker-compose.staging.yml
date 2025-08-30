@@ -16,7 +16,7 @@ services:
     networks:
       - casmitter_network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U casmitter -d casmitter_staging"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -45,7 +45,7 @@ services:
   app:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.staging
     container_name: casmitter_app_staging
     restart: unless-stopped
     env_file:
