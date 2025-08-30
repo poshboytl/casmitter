@@ -498,6 +498,14 @@ setup_ssl_certificates() {
 start_services() {
     log_info "Starting $ENVIRONMENT services..."
     
+    # Check if rebuild is needed
+    if check_rebuild_needed; then
+        log_info "Rebuild needed, building application image..."
+        force_rebuild
+    else
+        log_info "Using existing image, no rebuild needed"
+    fi
+    
     # Create directories first
     create_directories
     
@@ -686,7 +694,7 @@ case "${1:-start}" in
         echo "  logs            - Show logs for all services"
         echo "  status          - Show service status and SSL certificate status"
         echo "  cert-only       - Only setup SSL certificates (for testing Let's Encrypt)"
-        echo "  debug-cert      - Debug SSL certificate information and structure"
+        echo "  debug-cert      - Debug SSL certificate information"
         echo ""
         echo "Options:"
         echo "  -b, --branch <branch>  - Pull latest code from specified Git branch before deployment"
