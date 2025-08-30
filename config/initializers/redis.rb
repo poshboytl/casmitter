@@ -1,12 +1,11 @@
 # Redis configuration
-redis_config = YAML.load_file(Rails.root.join('config', 'redis.yml'), aliases: true)[Rails.env]
-
+# Use environment variables directly to avoid ERB template issues during Docker build
 $redis = Redis.new(
-  url: redis_config['url'],
-  password: redis_config['password'],
-  ssl: redis_config['ssl'],
-  timeout: redis_config['timeout'],
-  reconnect_attempts: redis_config['reconnect_attempts']
+  url: ENV.fetch("REDIS_URL", "redis://localhost:6379/0"),
+  password: ENV.fetch("REDIS_PASSWORD", ""),
+  ssl: ENV.fetch("REDIS_SSL", "false") == "true",
+  timeout: ENV.fetch("REDIS_TIMEOUT", 1).to_i,
+  reconnect_attempts: ENV.fetch("REDIS_RECONNECT_ATTEMPTS", 1).to_i
 )
 
 # Redis namespace for different environments
