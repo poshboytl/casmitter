@@ -1,5 +1,5 @@
 # Redis configuration
-redis_config = YAML.load_file(Rails.root.join('config', 'redis.yml'))[Rails.env]
+redis_config = YAML.load_file(Rails.root.join('config', 'redis.yml'), aliases: true)[Rails.env]
 
 $redis = Redis.new(
   url: redis_config['url'],
