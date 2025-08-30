@@ -115,7 +115,7 @@ services:
       - ./nginx/ssl:/etc/nginx/ssl
       - ./nginx/webroot:/var/www/html
       - ./nginx/logs:/var/log/nginx
-      - ./public:/var/www/html
+      - ./public:/var/www/html/public
 
     depends_on:
       app:
