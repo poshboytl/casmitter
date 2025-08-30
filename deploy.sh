@@ -493,7 +493,84 @@ setup_ssl_certificates() {
     fi
 }
 
+# Check if rebuild is needed
+check_rebuild_needed() {
+    log_info "Checking if rebuild is needed..."
+    
+    # Check if app image exists
+    local image_name=$(docker images --format "{{.Repository}}:{{.Tag}}" | grep "casmitter_app_staging" | head -1)
+    
+    if [ -z "$image_name" ]; then
+        log_info "App image not found, rebuild needed"
+        return 0
+    fi
+    
+    # Check if source code has changed since last build
+    local last_build_time=$(docker inspect --format='{{.Created}}' "$image_name" 2>/dev/null | cut -d'T' -f1)
+    
+    if [ -z "$last_build_time" ]; then
+        log_info "Could not determine last build time, rebuild needed"
+        return 0
+    fi
+    
+    # Check if key files have been modified since last build
+    local key_files=("Gemfile" "Gemfile.lock" "Dockerfile.staging" "config/" "app/" "lib/")
+    local rebuild_needed=false
+    
+    for file in "${key_files[@]}"; do
+        if [ -e "$file" ]; then
+            local file_time=$(stat -c %Y "$file" 2>/dev/null || stat -f %m "$file" 2>/dev/null)
+            local build_time=$(date -d "$last_build_time" +%s 2>/dev/null)
+            
+            if [ -n "$file_time" ] && [ -n "$build_time" ] && [ $file_time -gt $build_time ]; then
+                log_info "File $file has been modified since last build"
+                rebuild_needed=true
+                break
+            fi
+        fi
+    done
+    
+    if [ "$rebuild_needed" = true ]; then
+        log_info "Source code changes detected, rebuild needed"
+        return 0
+    fi
+    
+    # Check if environment variables have changed
+    local env_hash=$(md5sum "$ENV_FILE" 2>/dev/null | cut -d' ' -f1 || echo "unknown")
+    local last_env_hash_file=".last_env_hash"
+    
+    if [ -f "$last_env_hash_file" ]; then
+        local last_env_hash=$(cat "$last_env_hash_file")
+        if [ "$env_hash" != "$last_env_hash" ]; then
+            log_info "Environment variables have changed, rebuild needed"
+            return 0
+        fi
+    else
+        log_info "No previous environment hash found, rebuild needed"
+        return 0
+    fi
+    
+    log_info "No rebuild needed, using existing image"
+    return 1
+}
 
+# Force rebuild function
+force_rebuild() {
+    log_info "Force rebuilding application image..."
+    
+    # Clean up existing app image
+    docker rmi -f casmitter_app_staging 2>/dev/null || true
+    
+    # Rebuild the app image
+    log_info "Rebuilding app image..."
+    $DOCKER_COMPOSE -f $COMPOSE_FILE --env-file $ENV_FILE build app
+    
+    # Save current environment hash
+    local env_hash=$(md5sum "$ENV_FILE" 2>/dev/null | cut -d' ' -f1 || echo "unknown")
+    echo "$env_hash" > .last_env_hash
+    
+    log_info "App image rebuilt successfully"
+}
 
 start_services() {
     log_info "Starting $ENVIRONMENT services..."
