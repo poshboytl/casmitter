@@ -11,6 +11,16 @@ development:
 test:
   <<: *default
 
+staging:
+  store: redis_cache_store
+  url: <%= ENV.fetch("REDIS_URL", "redis://localhost:6379/2") %>
+  password: <%= ENV.fetch("REDIS_PASSWORD", "") %>
+  ssl: <%= ENV.fetch("REDIS_SSL", "false") == "true" %>
+  namespace: casmitter_staging_cache
+  expires_in: 1.hour
+  reconnect_attempts: 3
+  <<: *default
+
 production:
   database: cache
   <<: *default

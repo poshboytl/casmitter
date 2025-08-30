@@ -1,0 +1,24 @@
+default: &default
+  url: <%= ENV.fetch("REDIS_URL", "redis://localhost:6379/0") %>
+  timeout: 1
+  reconnect_attempts: 1
+
+development:
+  <<: *default
+  url: <%= ENV.fetch("REDIS_URL", "redis://localhost:6379/0") %>
+
+test:
+  <<: *default
+  url: <%= ENV.fetch("REDIS_URL", "redis://localhost:6379/1") %>
+
+staging:
+  <<: *default
+  url: <%= ENV.fetch("REDIS_URL", "redis://localhost:6379/2") %>
+  password: <%= ENV.fetch("REDIS_PASSWORD", "") %>
+  ssl: <%= ENV.fetch("REDIS_SSL", "false") == "true" %>
+
+production:
+  <<: *default
+  url: <%= ENV.fetch("REDIS_URL", "redis://localhost:6379/3") %>
+  password: <%= ENV.fetch("REDIS_PASSWORD", "") %>
+  ssl: <%= ENV.fetch("REDIS_SSL", "false") == "true" %>

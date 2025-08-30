@@ -1,0 +1,39 @@
+---
+:concurrency: <%= ENV.fetch("SIDEKIQ_CONCURRENCY", 5) %>
+:queues:
+  - [default, 1]
+  - [mailers, 2]
+  - [active_storage, 3]
+  - [high, 4]
+  - [low, 5]
+
+:redis:
+  url: <%= ENV.fetch("REDIS_URL", "redis://localhost:6379/2") %>
+  password: <%= ENV.fetch("REDIS_PASSWORD", "") %>
+  ssl: <%= ENV.fetch("REDIS_SSL", "false") == "true" %>
+  namespace: <%= Rails.env %>
+
+:logfile: ./log/sidekiq.log
+:pidfile: ./tmp/pids/sidekiq.pid
+
+:environment: <%= Rails.env %>
+
+# Staging specific settings
+:staging:
+  :concurrency: <%= ENV.fetch("SIDEKIQ_CONCURRENCY", 10) %>
+  :queues:
+    - [default, 1]
+    - [mailers, 2]
+    - [active_storage, 3]
+    - [high, 4]
+    - [low, 5]
+
+# Production specific settings
+:production:
+  :concurrency: <%= ENV.fetch("SIDEKIQ_CONCURRENCY", 25) %>
+  :queues:
+    - [default, 1]
+    - [mailers, 2]
+    - [active_storage, 3]
+    - [high, 4]
+    - [low, 5]

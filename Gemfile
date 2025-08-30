@@ -20,9 +20,11 @@ gem "tailwindcss-rails", "~> 4.0"
 
 # Data & Storage
 gem "pg", group: :production
-gem "solid_cache"
-gem "solid_queue"
-gem "solid_cable"
+
+# Redis & Sidekiq
+gem "redis", "~> 5.0"
+gem "sidekiq", "~> 7.0"
+gem "redis-namespace"
 
 # Authentication & Security
 gem "bcrypt", "~> 3.1.7"

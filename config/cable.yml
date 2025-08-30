@@ -9,10 +9,11 @@ test:
   adapter: test
 
 staging:
-  adapter: solid_cable
-  connects_to:
-    database:
-      writing: cable
+  adapter: redis
+  url: <%= ENV.fetch("REDIS_URL", "redis://localhost:6379/2") %>
+  password: <%= ENV.fetch("REDIS_PASSWORD", "") %>
+  ssl: <%= ENV.fetch("REDIS_SSL", "false") == "true" %>
+  channel_prefix: casmitter_staging
   polling_interval: 0.1.seconds
   message_retention: 1.day
 

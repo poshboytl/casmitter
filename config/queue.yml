@@ -14,5 +14,21 @@ development:
 test:
   <<: *default
 
+staging:
+  adapter: sidekiq
+  redis:
+    url: <%= ENV.fetch("REDIS_URL", "redis://localhost:6379/2") %>
+    password: <%= ENV.fetch("REDIS_PASSWORD", "") %>
+    ssl: <%= ENV.fetch("REDIS_SSL", "false") == "true" %>
+    namespace: casmitter_staging_queue
+  concurrency: <%= ENV.fetch("SIDEKIQ_CONCURRENCY", 10) %>
+  queues:
+    - [default, 1]
+    - [mailers, 2]
+    - [active_storage, 3]
+    - [high, 4]
+    - [low, 5]
+  <<: *default
+
 production:
   <<: *default
