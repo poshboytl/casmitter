@@ -220,30 +220,44 @@ check_ssl_certificates() {
             local current_date=$(date +%s)
             local days_until_expiry=$(( (expiry_date - current_date) / 86400 ))
             
-            # Only accept Let's Encrypt or other CA certificates
-            local issuer=$(openssl x509 -issuer -noout -in "$cert_file" 2>/dev/null | grep -o "CN=.*" | cut -d= -f2)
-            local subject=$(openssl x509 -subject -noout -in "$cert_file" 2>/dev/null | grep -o "CN=.*" | cut -d= -f2)
+            # Check if it's a self-signed certificate using more reliable method
+            local issuer_full=$(openssl x509 -issuer -noout -in "$cert_file" 2>/dev/null)
+            local subject_full=$(openssl x509 -subject -noout -in "$cert_file" 2>/dev/null)
             
-            if [ "$issuer" = "$subject" ]; then
-                log_warn "Self-signed SSL certificate detected in live directory"
-                log_info "Removing live directory (contains symlinks to self-signed certs)..."
-                # Remove only the live directory (contains symlinks)
-                rm -rf nginx/ssl/live
-                
-                # Check if we have valid Let's Encrypt certificates in archive
-                if [ -d "nginx/ssl/archive" ]; then
-                    log_info "Found Let's Encrypt certificates in archive. Run './fix-letsencrypt-structure.sh' to restore."
-                fi
-                return 1
-            else
-                # Let's Encrypt or other CA certificate
+            # Check if it's Let's Encrypt certificate
+            if echo "$issuer_full" | grep -q "Let's Encrypt\|Let's Encrypt Authority\|Let's Encrypt Authority X3\|Let's Encrypt Authority X4"; then
+                log_info "Let's Encrypt certificate detected - valid CA certificate"
                 if [ $days_until_expiry -gt 30 ]; then
-                    log_info "SSL certificates from CA are valid and will expire in $days_until_expiry days"
+                    log_info "SSL certificates from Let's Encrypt are valid and will expire in $days_until_expiry days"
                     return 0
                 else
-                    log_warn "SSL certificates will expire in $days_until_expiry days"
+                    log_warn "Let's Encrypt certificates will expire in $days_until_expiry days"
                     return 1
                 fi
+            # Check if it's other CA certificate
+            elif echo "$issuer_full" | grep -q "CN=" && echo "$subject_full" | grep -q "CN="; then
+                local issuer_cn=$(echo "$issuer_full" | grep -o "CN=[^,]*" | cut -d= -f2)
+                local subject_cn=$(echo "$subject_full" | grep -o "CN=[^,]*" | cut -d= -f2)
+                
+                if [ "$issuer_cn" = "$subject_cn" ] && [ "$issuer_cn" != "staging.teahour.dev" ]; then
+                    log_warn "Self-signed SSL certificate detected in live directory"
+                    log_info "Removing live directory (contains symlinks to self-signed certs)..."
+                    # Remove only the live directory (contains symlinks)
+                    rm -rf nginx/ssl/live
+                    return 1
+                else
+                    log_info "CA certificate detected - valid certificate"
+                    if [ $days_until_expiry -gt 30 ]; then
+                        log_info "SSL certificates from CA are valid and will expire in $days_until_expiry days"
+                        return 0
+                    else
+                        log_warn "SSL certificates will expire in $days_until_expiry days"
+                        return 1
+                    fi
+                fi
+            else
+                log_warn "Could not determine certificate type"
+                return 1
             fi
         else
             log_warn "Could not determine certificate expiry date"
@@ -637,6 +651,21 @@ case "${1:-start}" in
         setup_ssl_certificates
         log_info "Certificate only deployment completed."
         ;;
+    debug-cert)
+        log_info "Debugging SSL certificate information..."
+        if [ -d "nginx/ssl" ]; then
+            log_info "SSL directory structure:"
+            find nginx/ssl -type f -name "*.pem" 2>/dev/null | while read certfile; do
+                log_info "Certificate file: $certfile"
+                log_info "  Issuer: $(openssl x509 -issuer -noout -in "$certfile" 2>/dev/null || echo 'Error reading issuer')"
+                log_info "  Subject: $(openssl x509 -subject -noout -in "$certfile" 2>/dev/null || echo 'Error reading subject')"
+                log_info "  Expires: $(openssl x509 -enddate -noout -in "$certfile" 2>/dev/null || echo 'Error reading expiry')"
+                log_info "  ---"
+            done
+        else
+            log_info "No SSL directory found"
+        fi
+        ;;
     full-deploy)
         log_info "Running full deployment..."
         check_dependencies
@@ -665,6 +694,7 @@ case "${1:-start}" in
         echo "  generate-secret - Generate new SECRET_KEY_BASE"
         echo "  clean-ssl       - Clean up all SSL certificates and related files"
         echo "  cert-only       - Only setup SSL certificates (for testing Let's Encrypt)"
+        echo "  debug-cert      - Debug SSL certificate information and structure"
         echo "  full-deploy     - Full deployment (pull code, start services, setup DB)"
         echo ""
         echo "Options:"
@@ -676,6 +706,7 @@ case "${1:-start}" in
         echo "  $0 start --branch main      - Pull main branch and start services"
         echo "  $0 clean-ssl                - Clean up all SSL certificates"
         echo "  $0 cert-only                - Only setup SSL certificates (for testing Let's Encrypt)"
+        echo "  $0 debug-cert               - Debug SSL certificate information"
         echo "  $0 full-deploy              - Full deployment (pull code, start services, setup DB)"
         exit 1
         ;;
