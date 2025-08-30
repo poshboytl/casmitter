@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Multi-Environment Deployment Script for Casmitter
-# Usage: ./deploy.sh [start|stop|restart|logs|ssl|auto-ssl] [options]
+# Usage: ./deploy.sh [start|stop|restart|logs|ssl|auto-ssl|cert-only|full-deploy] [options]
 # Options:
 #   -b, --branch <branch>    Git branch to pull before deployment (e.g., -b staging)
 
@@ -271,40 +271,75 @@ setup_ssl_certificates() {
     
     log_info "Attempting to obtain Let's Encrypt SSL certificates..."
     
-    # Ensure nginx is running in HTTP mode for ACME challenges
-    if ! $DOCKER_COMPOSE -f $COMPOSE_FILE --env-file $ENV_FILE ps nginx | grep -q "Up"; then
-        log_info "Starting nginx in HTTP mode for ACME challenges..."
-        $DOCKER_COMPOSE -f $COMPOSE_FILE --env-file $ENV_FILE up -d nginx
-        sleep 5  # Wait for nginx to be ready
-    fi
+    # Create a simple nginx container just for ACME challenges
+    log_info "Creating a simple nginx container for ACME challenges..."
+    
+    # Stop any existing nginx containers
+    docker stop nginx-certbot 2>/dev/null || true
+    docker rm nginx-certbot 2>/dev/null || true
+    
+    # Create webroot directory
+    mkdir -p nginx/webroot/.well-known/acme-challenge
+    
+    # Create a simple nginx container for ACME challenges
+    docker run -d \
+        --name nginx-certbot \
+        -p 80:80 \
+        -v "$(pwd)/nginx/webroot:/var/www/html" \
+        -v "$(pwd)/nginx/conf.d/certbot.conf:/etc/nginx/conf.d/default.conf" \
+        nginx:alpine
+    
+    # Wait for nginx to be ready
+    log_info "Waiting for nginx to be ready..."
+    sleep 5
     
     # Verify nginx is accessible on port 80
     log_info "Verifying nginx is accessible on port 80..."
     if ! curl -f http://localhost/up > /dev/null 2>&1; then
         log_error "Nginx is not accessible on port 80. Cannot proceed with SSL setup."
+        docker stop nginx-certbot 2>/dev/null || true
+        docker rm nginx-certbot 2>/dev/null || true
         return 1
     fi
     
     # Run certbot to obtain certificates
     log_info "Running certbot to obtain certificates..."
-    if $DOCKER_COMPOSE -f $COMPOSE_FILE --env-file $ENV_FILE run --rm certbot; then
+    
+    # Create certbot container
+    if docker run --rm \
+        --network host \
+        -v "$(pwd)/nginx/ssl:/etc/letsencrypt" \
+        -v "$(pwd)/nginx/webroot:/var/www/html" \
+        certbot/certbot \
+        certonly \
+        --webroot \
+        --webroot-path=/var/www/html \
+        --email "$CERTBOT_EMAIL" \
+        --agree-tos \
+        --no-eff-email \
+        --domains "$DOMAIN_NAME"; then
+        
         log_info "SSL certificates generated successfully"
         
         # Set proper permissions
         chmod -R 644 nginx/ssl/live 2>/dev/null || true
         chmod -R 600 nginx/ssl/live/*/privkey.pem 2>/dev/null || true
         
-        # Restart nginx to load new certificates
-        log_info "Restarting nginx to load new SSL certificates..."
-        $DOCKER_COMPOSE -f $COMPOSE_FILE --env-file $ENV_FILE restart nginx
+        # Stop the temporary nginx container
+        log_info "Stopping temporary nginx container..."
+        docker stop nginx-certbot 2>/dev/null || true
+        docker rm nginx-certbot 2>/dev/null || true
         
         log_info "SSL setup completed successfully"
         return 0
     else
         log_error "Failed to generate SSL certificates"
-        log_warn "Nginx will continue running in HTTP mode"
-        log_info "You can manually retry SSL setup with: ./deploy.sh ssl"
         
+        # Stop the temporary nginx container
+        docker stop nginx-certbot 2>/dev/null || true
+        docker rm nginx-certbot 2>/dev/null || true
+        
+        log_warn "You can manually retry SSL setup with: ./deploy.sh ssl"
         return 1
     fi
 }
@@ -345,8 +380,8 @@ start_services() {
     log_info "Waiting for application to be ready..."
     sleep 30
     
-    # Start nginx in HTTP mode first for ACME challenges
-    log_info "Starting nginx in HTTP mode for initial deployment..."
+    # Start nginx (will use existing SSL certificates if available)
+    log_info "Starting nginx..."
     $DOCKER_COMPOSE -f $COMPOSE_FILE --env-file $ENV_FILE up -d nginx
     
     # Wait for nginx to be ready
@@ -360,17 +395,14 @@ start_services() {
         log_warn "Nginx may not be fully ready yet, continuing..."
     fi
     
-    # Setup SSL certificates
-    auto_ssl_setup
-    
     log_info "Services started successfully"
     
-    # Check final status
+    # Check SSL status
     if check_ssl_certificates; then
         log_info "Application will be available at: https://$DOMAIN_NAME"
     else
-        log_warn "SSL setup failed, application will be available at: http://$DOMAIN_NAME"
-        log_info "You can manually retry SSL setup with: ./deploy.sh ssl"
+        log_warn "SSL certificates not found, application will be available at: http://$DOMAIN_NAME"
+        log_info "You can setup SSL certificates with: ./deploy.sh cert-only"
     fi
 }
 
@@ -470,6 +502,8 @@ case "${1:-start}" in
             fi
         fi
         
+        # For backward compatibility, start now calls full-deploy
+        log_info "Starting full deployment..."
         start_services
         log_info "Waiting for services to be ready..."
         sleep 30
@@ -510,8 +544,24 @@ case "${1:-start}" in
     generate-secret)
         generate_secret_key
         ;;
+    cert-only)
+        log_info "Running certificate only deployment..."
+        check_dependencies
+        setup_ssl_certificates
+        log_info "Certificate only deployment completed."
+        ;;
+    full-deploy)
+        log_info "Running full deployment..."
+        check_dependencies
+        start_services
+        log_info "Waiting for services to be ready..."
+        sleep 30
+        setup_database
+        log_info "Deployment completed successfully!"
+        show_status
+        ;;
     *)
-        echo "Usage: $0 {start|stop|restart|logs|status|ssl|auto-ssl|force-ssl|setup-db|generate-secret} [options]"
+        echo "Usage: $0 {start|stop|restart|logs|status|ssl|auto-ssl|force-ssl|setup-db|generate-secret|cert-only|full-deploy} [options]"
         echo ""
         echo "Environment: $ENVIRONMENT (configured in $ENV_FILE)"
         echo ""
@@ -526,6 +576,8 @@ case "${1:-start}" in
         echo "  force-ssl       - Force Let's Encrypt SSL certificate setup (removes existing certs)"
         echo "  setup-db        - Setup database (migrations, seeds)"
         echo "  generate-secret - Generate new SECRET_KEY_BASE"
+        echo "  cert-only       - Only setup SSL certificates (for testing Let's Encrypt)"
+        echo "  full-deploy     - Full deployment (pull code, start services, setup DB)"
         echo ""
         echo "Options:"
         echo "  -b, --branch <branch>  - Pull latest code from specified Git branch before deployment"
@@ -534,6 +586,8 @@ case "${1:-start}" in
         echo "  $0 start                    - Start services with current code"
         echo "  $0 start -b staging         - Pull staging branch and start services"
         echo "  $0 start --branch main      - Pull main branch and start services"
+        echo "  $0 cert-only                - Only setup SSL certificates (for testing Let's Encrypt)"
+        echo "  $0 full-deploy              - Full deployment (pull code, start services, setup DB)"
         exit 1
         ;;
 esac
