@@ -219,10 +219,11 @@ create_directories() {
 check_ssl_certificates() {
     log_info "Checking SSL certificates..."
     
-    local cert_file="nginx/ssl/live/${DOMAIN_NAME}/fullchain.pem"
-    local key_file="nginx/ssl/live/${DOMAIN_NAME}/privkey.pem"
+    # Use wildcard to find the correct certificate directory
+    local cert_file=$(find nginx/ssl/live -name "fullchain.pem" -path "*/${DOMAIN_NAME}*" 2>/dev/null | head -1)
+    local key_file=$(find nginx/ssl/live -name "privkey.pem" -path "*/${DOMAIN_NAME}*" 2>/dev/null | head -1)
     
-    if [ -f "$cert_file" ] && [ -f "$key_file" ]; then
+    if [ -n "$cert_file" ] && [ -n "$key_file" ] && [ -f "$cert_file" ] && [ -f "$key_file" ]; then
         # Check if certificates are valid and not expired
         local cert_expiry=$(openssl x509 -enddate -noout -in "$cert_file" 2>/dev/null | cut -d= -f2)
         if [ -n "$cert_expiry" ]; then
