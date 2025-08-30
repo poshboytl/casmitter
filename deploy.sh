@@ -269,6 +269,76 @@ check_ssl_certificates() {
     fi
 }
 
+handle_certificates() {
+    log_info "Handling SSL certificates..."
+    
+    # Check if we have valid certificates in archive that can be restored
+    if [ -d "nginx/ssl/archive" ]; then
+        log_info "Found SSL archive directory, checking for existing certificates..."
+        
+        # Look for valid certificates in archive
+        local archive_cert=$(find nginx/ssl/archive -name "fullchain*.pem" -path "*/${DOMAIN_NAME}*" 2>/dev/null | head -1)
+        local archive_key=$(find nginx/ssl/archive -name "privkey*.pem" -path "*/${DOMAIN_NAME}*" 2>/dev/null | head -1)
+        
+        if [ -n "$archive_cert" ] && [ -n "$archive_key" ] && [ -f "$archive_cert" ] && [ -f "$archive_key" ]; then
+            log_info "Found existing certificates in archive, attempting to restore structure..."
+            
+            # Check if certificate is valid and not expired
+            local cert_expiry=$(openssl x509 -enddate -noout -in "$archive_cert" 2>/dev/null | cut -d= -f2)
+            if [ -n "$cert_expiry" ]; then
+                local expiry_date=$(date -d "$cert_expiry" +%s 2>/dev/null)
+                local current_date=$(date +%s)
+                local days_until_expiry=$(( (expiry_date - current_date) / 86400 ))
+                
+                if [ $days_until_expiry -gt 0 ]; then
+                    log_info "Certificate is valid and expires in $days_until_expiry days"
+                    
+                    # Check if it's a Let's Encrypt certificate
+                    local issuer=$(openssl x509 -issuer -noout -in "$archive_cert" 2>/dev/null)
+                    if echo "$issuer" | grep -q "Let's Encrypt\|Let's Encrypt Authority\|Let's Encrypt Authority X3\|Let's Encrypt Authority X4"; then
+                        log_info "Let's Encrypt certificate detected, restoring directory structure..."
+                        
+                        # Create live directory structure
+                        mkdir -p "nginx/ssl/live/${DOMAIN_NAME}"
+                        
+                        # Find the latest certificate files
+                        local cert_file=$(find "nginx/ssl/archive/${DOMAIN_NAME}" -name "fullchain*.pem" | sort -V | tail -1)
+                        local key_file=$(find "nginx/ssl/archive/${DOMAIN_NAME}" -name "privkey*.pem" | sort -V | tail -1)
+                        local chain_file=$(find "nginx/ssl/archive/${DOMAIN_NAME}" -name "chain*.pem" | sort -V | tail -1)
+                        
+                        # Create symlinks
+                        ln -sf "../../archive/${DOMAIN_NAME}/$(basename $cert_file)" "nginx/ssl/live/${DOMAIN_NAME}/fullchain.pem"
+                        ln -sf "../../archive/${DOMAIN_NAME}/$(basename $key_file)" "nginx/ssl/live/${DOMAIN_NAME}/privkey.pem"
+                        
+                        if [ -n "$chain_file" ]; then
+                            ln -sf "../../archive/${DOMAIN_NAME}/$(basename $chain_file)" "nginx/ssl/live/${DOMAIN_NAME}/chain.pem"
+                        fi
+                        
+                        # Set proper permissions
+                        chmod 644 "nginx/ssl/live/${DOMAIN_NAME}/fullchain.pem" 2>/dev/null || true
+                        chmod 644 "nginx/ssl/live/${DOMAIN_NAME}/chain.pem" 2>/dev/null || true
+                        chmod 600 "nginx/ssl/live/${DOMAIN_NAME}/privkey.pem" 2>/dev/null || true
+                        
+                        log_info "Directory structure restored successfully!"
+                        log_info "Certificate will expire in $days_until_expiry days"
+                        return 0
+                    else
+                        log_warn "Certificate is not from Let's Encrypt, will request new certificate"
+                    fi
+                else
+                    log_warn "Certificate has expired, will request new certificate"
+                fi
+            else
+                log_warn "Could not determine certificate expiry, will request new certificate"
+            fi
+        fi
+    fi
+    
+    # If we reach here, we need to get new certificates
+    log_info "No valid certificates found, requesting new Let's Encrypt certificates..."
+    setup_ssl_certificates
+}
+
 setup_ssl_certificates() {
     log_info "Setting up SSL certificates..."
     
@@ -556,72 +626,7 @@ case "${1:-start}" in
     cert-only)
         log_info "Running certificate only deployment..."
         check_dependencies
-        
-        # Check if we have valid certificates in archive that can be restored
-        if [ -d "nginx/ssl/archive" ]; then
-            log_info "Found SSL archive directory, checking for existing certificates..."
-            
-            # Look for valid certificates in archive
-            local archive_cert=$(find nginx/ssl/archive -name "fullchain*.pem" -path "*/${DOMAIN_NAME}*" 2>/dev/null | head -1)
-            local archive_key=$(find nginx/ssl/archive -name "privkey*.pem" -path "*/${DOMAIN_NAME}*" 2>/dev/null | head -1)
-            
-            if [ -n "$archive_cert" ] && [ -n "$archive_key" ] && [ -f "$archive_cert" ] && [ -f "$archive_key" ]; then
-                log_info "Found existing certificates in archive, attempting to restore structure..."
-                
-                # Check if certificate is valid and not expired
-                local cert_expiry=$(openssl x509 -enddate -noout -in "$archive_cert" 2>/dev/null | cut -d= -f2)
-                if [ -n "$cert_expiry" ]; then
-                    local expiry_date=$(date -d "$cert_expiry" +%s 2>/dev/null)
-                    local current_date=$(date +%s)
-                    local days_until_expiry=$(( (expiry_date - current_date) / 86400 ))
-                    
-                    if [ $days_until_expiry -gt 0 ]; then
-                        log_info "Certificate is valid and expires in $days_until_expiry days"
-                        
-                        # Check if it's a Let's Encrypt certificate
-                        local issuer=$(openssl x509 -issuer -noout -in "$archive_cert" 2>/dev/null)
-                        if echo "$issuer" | grep -q "Let's Encrypt\|Let's Encrypt Authority\|Let's Encrypt Authority X3\|Let's Encrypt Authority X4"; then
-                            log_info "Let's Encrypt certificate detected, restoring directory structure..."
-                            
-                            # Create live directory structure
-                            mkdir -p "nginx/ssl/live/${DOMAIN_NAME}"
-                            
-                            # Find the latest certificate files
-                            local cert_file=$(find "nginx/ssl/archive/${DOMAIN_NAME}" -name "fullchain*.pem" | sort -V | tail -1)
-                            local key_file=$(find "nginx/ssl/archive/${DOMAIN_NAME}" -name "privkey*.pem" | sort -V | tail -1)
-                            local chain_file=$(find "nginx/ssl/archive/${DOMAIN_NAME}" -name "chain*.pem" | sort -V | tail -1)
-                            
-                            # Create symlinks
-                            ln -sf "../../archive/${DOMAIN_NAME}/$(basename $cert_file)" "nginx/ssl/live/${DOMAIN_NAME}/fullchain.pem"
-                            ln -sf "../../archive/${DOMAIN_NAME}/$(basename $key_file)" "nginx/ssl/live/${DOMAIN_NAME}/privkey.pem"
-                            
-                            if [ -n "$chain_file" ]; then
-                                ln -sf "../../archive/${DOMAIN_NAME}/$(basename $chain_file)" "nginx/ssl/live/${DOMAIN_NAME}/chain.pem"
-                            fi
-                            
-                            # Set proper permissions
-                            chmod 644 "nginx/ssl/live/${DOMAIN_NAME}/fullchain.pem" 2>/dev/null || true
-                            chmod 644 "nginx/ssl/live/${DOMAIN_NAME}/chain.pem" 2>/dev/null || true
-                            chmod 600 "nginx/ssl/live/${DOMAIN_NAME}/privkey.pem" 2>/dev/null || true
-                            
-                            log_info "Directory structure restored successfully!"
-                            log_info "Certificate will expire in $days_until_expiry days"
-                            return 0
-                        else
-                            log_warn "Certificate is not from Let's Encrypt, will request new certificate"
-                        fi
-                    else
-                        log_warn "Certificate has expired, will request new certificate"
-                    fi
-                else
-                    log_warn "Could not determine certificate expiry, will request new certificate"
-                fi
-            fi
-        fi
-        
-        # If we reach here, we need to get new certificates
-        log_info "No valid certificates found, requesting new Let's Encrypt certificates..."
-        setup_ssl_certificates
+        handle_certificates
         log_info "Certificate only deployment completed."
         ;;
     debug-cert)
