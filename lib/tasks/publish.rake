@@ -184,4 +184,47 @@ namespace :publish do
     puts "Episode 5 deleted!"
   end
 
+  desc "Publish Episode 6"
+  task episode_6: :environment do
+    terry = Host.find_by(name: "Terry Tai")
+    jan = Host.find_by(name: "Jan Xie")
+    howard = Host.find_by(name: "Howard Ye")
+    ash = Guest.find_by(name: "Ash Chen")
+  
+
+    file_uri = "https://assets.teahour.dev/teahour2_6.mp3"
+    file_size = FileUtils.get_remote_file_size(file_uri)
+    puts "File size: #{file_size} bytes"
+
+    episode_6 = Episode.create!(
+      name: "教练，我想一辈子写代码！（下）",
+      file_uri: file_uri,
+      summary: "这一期我们继续和老朋友 Ash 聊聊他如何 “开飞机”，“打飞机”， 搞 CAD, 自己做木工， 3D 打印， 还有啥？...",
+      desc: File.read(Rails.root.join('db', 'seeds', 'episode_6_desc.md')),
+      status: 1,
+      keywords: 'ai, programmer, developer, hobby, cad',
+      number: 6,
+      slug: '6',
+      duration: 6067,
+      published_at: Time.zone.now,
+      cover_url: "https://assets.teahour.dev/teahour2-ep6a-cover.png",
+      length: file_size
+    )
+      
+    puts "Creating attendances..."
+    Attendance.create!(attendee: terry, episode: episode_6, role: 0)
+    Attendance.create!(attendee: jan, episode: episode_6, role: 0)
+    Attendance.create!(attendee: howard, episode: episode_6, role: 0)
+    Attendance.create!(attendee: ash, episode: episode_6, role: 1)
+
+    puts "Episode 6 published!"
+  end
+
+  desc "Delete Episode 6"
+  task delete_episode_6: :environment do
+    episode_6 = Episode.find_by(number: 6)
+    Attendance.where(episode: episode_6).destroy_all
+    episode_6.destroy
+    puts "Episode 6 deleted!"
+  end
 end
