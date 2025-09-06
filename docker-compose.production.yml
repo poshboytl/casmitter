@@ -56,7 +56,7 @@ services:
     volumes:
       - ./storage:/rails/storage
       - ./log:/rails/log
-      - ./tmp:/rails/tmp
+      - tmp_data:/rails/tmp
     depends_on:
       redis:
         condition: service_healthy
@@ -111,6 +111,8 @@ services:
 
 volumes:
   redis_data:
+    driver: local
+  tmp_data:
     driver: local
 
 networks:
