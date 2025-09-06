@@ -497,8 +497,13 @@ setup_ssl_certificates() {
 check_rebuild_needed() {
     log_info "Checking if rebuild is needed..."
     
-    # Check if app image exists
-    local image_name=$(docker images --format "{{.Repository}}:{{.Tag}}" | grep "casmitter_app_staging" | head -1)
+    # Determine image name based on environment
+    local image_name=""
+    if [ "$ENVIRONMENT" = "production" ]; then
+        image_name=$(docker images --format "{{.Repository}}:{{.Tag}}" | grep "casmitter_app_production" | head -1)
+    else
+        image_name=$(docker images --format "{{.Repository}}:{{.Tag}}" | grep "casmitter_app_staging" | head -1)
+    fi
     
     if [ -z "$image_name" ]; then
         log_info "App image not found, rebuild needed"
@@ -514,7 +519,12 @@ check_rebuild_needed() {
     fi
     
     # Check if key files have been modified since last build
-    local key_files=("Gemfile" "Gemfile.lock" "Dockerfile.staging" "config/" "app/" "lib/")
+    local key_files=("Gemfile" "Gemfile.lock" "config/" "app/" "lib/")
+    if [ "$ENVIRONMENT" = "production" ]; then
+        key_files+=("Dockerfile.prod")
+    else
+        key_files+=("Dockerfile.staging")
+    fi
     local rebuild_needed=false
     
     for file in "${key_files[@]}"; do
@@ -558,8 +568,12 @@ check_rebuild_needed() {
 force_rebuild() {
     log_info "Force rebuilding application image..."
     
-    # Clean up existing app image
-    docker rmi -f casmitter_app_staging 2>/dev/null || true
+    # Clean up existing app image based on environment
+    if [ "$ENVIRONMENT" = "production" ]; then
+        docker rmi -f casmitter_app_production 2>/dev/null || true
+    else
+        docker rmi -f casmitter_app_staging 2>/dev/null || true
+    fi
     
     # Rebuild the app image
     log_info "Rebuilding app image..."
@@ -588,7 +602,13 @@ start_services() {
     
     # Start core services (without nginx first)
     log_info "Starting core services..."
-    $DOCKER_COMPOSE -f $COMPOSE_FILE --env-file $ENV_FILE up -d postgres redis app
+    if [ "$ENVIRONMENT" = "production" ]; then
+        # Production uses external database, so start redis and app only
+        $DOCKER_COMPOSE -f $COMPOSE_FILE --env-file $ENV_FILE up -d redis app
+    else
+        # Staging uses local postgres
+        $DOCKER_COMPOSE -f $COMPOSE_FILE --env-file $ENV_FILE up -d postgres redis app
+    fi
     
     # Wait for app to be ready
     log_info "Waiting for application to be ready..."
@@ -689,13 +709,20 @@ show_status() {
 setup_database() {
     log_info "Setting up database..."
     
-    # Wait for database to be ready
-    log_info "Waiting for database to be ready..."
-    $DOCKER_COMPOSE -f $COMPOSE_FILE --env-file $ENV_FILE exec -T postgres pg_isready -U casmitter
-    
-    # Run database migrations
-    log_info "Running database migrations..."
-    $DOCKER_COMPOSE -f $COMPOSE_FILE --env-file $ENV_FILE exec -T app bundle exec rails db:migrate
+    if [ "$ENVIRONMENT" = "production" ]; then
+        # For production, we use external database, so just run migrations
+        log_info "Production environment detected - using external database"
+        log_info "Running database migrations..."
+        $DOCKER_COMPOSE -f $COMPOSE_FILE --env-file $ENV_FILE exec -T app bundle exec rails db:migrate
+    else
+        # For staging, wait for local postgres to be ready
+        log_info "Waiting for database to be ready..."
+        $DOCKER_COMPOSE -f $COMPOSE_FILE --env-file $ENV_FILE exec -T postgres pg_isready -U casmitter
+        
+        # Run database migrations
+        log_info "Running database migrations..."
+        $DOCKER_COMPOSE -f $COMPOSE_FILE --env-file $ENV_FILE exec -T app bundle exec rails db:migrate
+    fi
     
     log_info "Database setup completed"
 }
