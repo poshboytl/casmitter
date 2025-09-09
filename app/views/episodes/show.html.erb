@@ -9,11 +9,10 @@
       <p class="text-gray-500 mt-2">
         Episode <%= @episode.number %> · <%= @episode.published_at.strftime("%Y-%m-%d") %> · <%= (@episode.duration || 0) / 3600 %> hr <%= (@episode.duration || 0 % 3600) / 60 %> mins
       </p>
-      <div class="mt-4">
-        <audio class="w-full" controls="">
-          <source src="<%= @episode.file_uri %>" type="audio/mpeg"/>
-          Your browser does not support the audio element.
-        </audio>
+      <div class="mt-4 w-full">        
+        <%= render 'shared/audio_player', 
+            src: @episode.file_uri,
+            cover: @episode.cover_url.presence || asset_path("omshow.png") %>
       </div>
       <%= render 'shared/subscription_buttons' %>
     </div>
